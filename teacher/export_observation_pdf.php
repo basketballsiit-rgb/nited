@@ -70,7 +70,7 @@ foreach ($results as $r) {
 $subject_code = htmlspecialchars($supervision['subject_code'] ?? '-');
 $subject_name = htmlspecialchars($supervision['subject_name'] ?? '-');
 $level = htmlspecialchars($supervision['level'] ?? '-');
-$department = htmlspecialchars($supervision['department'] ?? '-');
+$department = !empty($supervision['teaching_department']) ? htmlspecialchars($supervision['teaching_department']) : htmlspecialchars($supervision['department'] ?? '-');
 $teacher_name = htmlspecialchars($supervision['teacher_name'] ?? '-');
 $term = htmlspecialchars($supervision['term'] ?? '-');
 $year = htmlspecialchars($supervision['year'] ?? '-');

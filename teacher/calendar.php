@@ -90,6 +90,20 @@ if ($year_id > 0) {
             </div>
 
             <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">สาขาวิชาที่สอน <span style="color:red">*</span></label>
+                <select name="teaching_department" class="form-control" required>
+                    <option value="">-- เลือกสาขาวิชาที่สอน --</option>
+                    <option value="การบัญชี">การบัญชี</option>
+                    <option value="การตลาด">การตลาด</option>
+                    <option value="อิเล็กทรอนิกส์">อิเล็กทรอนิกส์</option>
+                    <option value="เทคนิคยานยนต์">เทคนิคยานยนต์</option>
+                    <option value="ไฟฟ้ากำลัง">ไฟฟ้ากำลัง</option>
+                    <option value="สารสนเทศ">สารสนเทศ</option>
+                    <option value="ระยะสั้น">ระยะสั้น</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 5px;">ไฟล์แผนการสอน (ถ้ามี PDF, DOC, DOCX)</label>
                 <input type="file" name="lesson_plan_file" accept=".pdf,.doc,.docx" class="form-control">
             </div>

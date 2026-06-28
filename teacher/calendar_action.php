@@ -82,8 +82,9 @@ try {
         $subject_code = trim($_POST['subject_code'] ?? '');
         $subject = trim($_POST['subject_name']);
         $level = trim($_POST['level'] ?? '');
+        $teaching_department = trim($_POST['teaching_department'] ?? '');
 
-        if (empty($subject_code) || empty($subject) || empty($level)) {
+        if (empty($subject_code) || empty($subject) || empty($level) || empty($teaching_department)) {
             echo json_encode(['status' => 'error', 'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน']);
             exit;
         }
@@ -228,10 +229,10 @@ try {
 
         // Insert Supervision Request
         $stmt = $pdo->prepare("
-            INSERT INTO supervisions (teacher_id, supervisor_id, academic_year_id, subject_code, subject_name, level, scheduled_date, end_time, status, lesson_plan_file)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+            INSERT INTO supervisions (teacher_id, supervisor_id, academic_year_id, subject_code, subject_name, level, teaching_department, scheduled_date, end_time, status, lesson_plan_file)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
         ");
-        $stmt->execute([$teacher_id, $selected_supervisor_id, $year_id, $subject_code, $subject, $level, $start_dt, $end_dt, $lesson_plan_path]);
+        $stmt->execute([$teacher_id, $selected_supervisor_id, $year_id, $subject_code, $subject, $level, $teaching_department, $start_dt, $end_dt, $lesson_plan_path]);
 
         // Send notification to the assigned supervisor
         $teacher_name = $_SESSION['name'];
