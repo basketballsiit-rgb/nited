@@ -40,7 +40,7 @@ if ($year_id > 0) {
 <div id="bookingModal" class="modal-overlay"
     style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1050;">
     <div class="modal-content"
-        style="background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 500px;">
+        style="background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
         <h3 style="margin-top: 0; margin-bottom: 20px;">จองการนิเทศการสอน</h3>
         <form id="bookingForm">
             <input type="hidden" name="action" value="book_slot">
