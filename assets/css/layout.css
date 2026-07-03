@@ -53,6 +53,9 @@ body {
     text-decoration: none;
     transition: all 0.3s ease;
     border-left: 4px solid transparent;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .nav-links li a:hover,
