@@ -5,7 +5,7 @@
 define('KEYCLOAK_URL', 'https://service.npc.ac.th'); // URL ของวิทยาลัย
 define('KEYCLOAK_REALM', 'NPC-SSO'); // Realm ของวิทยาลัย
 define('KEYCLOAK_CLIENT_ID', 'nited-app'); // รบกวนเปลี่ยนให้ตรงกับใน Keycloak
-define('KEYCLOAK_CLIENT_SECRET', 'your-client-secret'); // รบกวนนำ Secret จาก Keycloak มาใส่ตรงนี้ครับ
+define('KEYCLOAK_CLIENT_SECRET', '3E70DwHjVs69ZDdn4ZcRyu9c3NXkKRc7'); // รบกวนนำ Secret จาก Keycloak มาใส่ตรงนี้ครับ
 
 // Endpoints
 define('KEYCLOAK_AUTH_URL', KEYCLOAK_URL . '/realms/' . KEYCLOAK_REALM . '/protocol/openid-connect/auth');
