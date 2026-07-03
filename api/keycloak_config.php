@@ -2,7 +2,7 @@
 // api/keycloak_config.php
 // Configuration for Keycloak SSO
 
-define('KEYCLOAK_URL', 'http://service.npc.ac.th:8080'); // URL ของวิทยาลัย
+define('KEYCLOAK_URL', 'https://service.npc.ac.th'); // URL ของวิทยาลัย
 define('KEYCLOAK_REALM', 'NPC-SSO'); // Realm ของวิทยาลัย
 define('KEYCLOAK_CLIENT_ID', 'nited-app'); // รบกวนเปลี่ยนให้ตรงกับใน Keycloak
 define('KEYCLOAK_CLIENT_SECRET', 'your-client-secret'); // รบกวนนำ Secret จาก Keycloak มาใส่ตรงนี้ครับ
