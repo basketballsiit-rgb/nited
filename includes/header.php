@@ -18,8 +18,8 @@ require_once __DIR__ . '/../config/db.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบนิเทศการจัดการเรียนการสอน</title>
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/nited/assets/css/style.css">
-    <link rel="stylesheet" href="/nited/assets/css/layout.css">
+    <link rel="stylesheet" href="/nited/assets/css/style.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/nited/assets/css/layout.css?v=<?= time() ?>">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- FontAwesome -->

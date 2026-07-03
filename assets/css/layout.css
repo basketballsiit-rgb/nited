@@ -12,7 +12,7 @@ body {
 }
 
 .sidebar {
-    width: 250px;
+    width: 270px;
     background: #2c3e50;
     color: white;
     transition: all 0.3s ease;
@@ -48,7 +48,7 @@ body {
 
 .nav-links li a {
     display: block;
-    padding: 15px 20px;
+    padding: 15px 15px;
     color: #ecf0f1;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -77,7 +77,7 @@ body {
     min-width: 0;
     transition: all 0.3s ease;
     
-    margin-left: 250px;
+    margin-left: 270px;
 }
 
 .content-container {
@@ -87,7 +87,7 @@ body {
 
 /* Sidebar collapsed state */
 .wrapper.sidebar-collapsed .sidebar {
-    margin-left: -250px;
+    margin-left: -270px;
 }
 
 .wrapper.sidebar-collapsed .main-panel {
@@ -96,7 +96,7 @@ body {
 
 @media (max-width: 768px) {
     .sidebar {
-        margin-left: -250px; /* Hidden by default on mobile */
+        margin-left: -270px; /* Hidden by default on mobile */
     }
 
     .main-panel {
