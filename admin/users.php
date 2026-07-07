@@ -116,6 +116,8 @@ $all_departments = $stmt_dept->fetchAll(PDO::FETCH_COLUMN);
         justify-content: center;
         align-items: center;
         z-index: 1050;
+        overflow-y: auto;
+        padding: 20px;
     }
 
     .modal-content {
@@ -125,6 +127,8 @@ $all_departments = $stmt_dept->fetchAll(PDO::FETCH_COLUMN);
         width: 100%;
         max-width: 500px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
     }
 
     .close-modal {
