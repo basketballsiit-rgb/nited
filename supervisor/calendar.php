@@ -72,7 +72,12 @@ $supervisor_id = $_SESSION['user_id'];
 
                 const start = info.event.start;
                 const end = info.event.end;
-                const timeStr = `${start.toLocaleDateString('th-TH')} (${start.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })})`;
+                let timeStr = `${start.toLocaleDateString('th-TH')} (${start.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+                if (end) {
+                    timeStr += ` - ${end.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })})`;
+                } else {
+                    timeStr += `)`;
+                }
                 document.getElementById('m_time').innerText = timeStr;
 
                 const statusEl = document.getElementById('m_status');
