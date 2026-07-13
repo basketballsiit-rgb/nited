@@ -211,14 +211,26 @@ $html .= '<table style="width: 100%; border: none; margin-top: 20px;">';
 $html .= '<tr>';
 $html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0; font-size: 11pt; font-weight: normal;">(ลงชื่อ)</td>';
 $html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0; font-size: 11pt; font-weight: normal;">';
-$html .= '...................................................';
+
+$teacher_sig = $plan['teacher_signature_path'] ?? '';
+$t_sig_local = !empty($teacher_sig) ? __DIR__ . '/..' . str_replace('/nited', '', $teacher_sig) : '';
+
+if (!empty($t_sig_local) && file_exists($t_sig_local)) {
+    $html .= '<img src="' . $t_sig_local . '" style="max-height: 50px; max-width: 150px;">';
+} else {
+    $html .= '...................................................';
+}
+
 $html .= '</td>';
 $html .= '</tr>';
 $html .= '<tr>';
 $html .= '<td style="border: none; padding: 0;"></td>';
 $html .= '<td style="text-align: center; border: none; padding: 0; font-size: 11pt; font-weight: normal;">';
 $html .= '(' . $teacher_name . ')<br>';
-$html .= 'ผู้จัดทำแผนการจัดการเรียนรู้';
+$html .= 'ผู้จัดทำแผนการจัดการเรียนรู้<br>';
+if (!empty($plan['teacher_signed_at'])) {
+    $html .= '<span style="font-size: 9pt; color: #555;">วันที่รับทราบ: ' . date('d/m/Y', strtotime($plan['teacher_signed_at'])) . '</span>';
+}
 $html .= '</td>';
 $html .= '</tr>';
 $html .= '</table>';

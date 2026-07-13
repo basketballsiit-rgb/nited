@@ -190,11 +190,169 @@ foreach ($res as $r) {
         <p style="margin: 0; font-size: 16px; color: #555;">(ลงชื่อ) <?php echo htmlspecialchars($plan['reviewer_name'] ?? ''); ?> (ผู้ประเมิน)</p>
     </div>
     <?php endif; ?>
+
+    <?php if (empty($plan['teacher_signature_path'])): ?>
+        <div class="content-card" style="margin-top: 30px; background-color: #fcfcfc; border: 2px dashed #3498db;">
+            <h3 style="color: #3498db; text-align: center;"><i class="fas fa-pen-nib"></i> เซ็นรับทราบผลการประเมิน</h3>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">กรุณาเซ็นชื่อรับทราบผลการประเมินก่อนที่จะส่งออกเป็นเอกสาร PDF</p>
+            
+            <form id="teacherSignForm">
+                <input type="hidden" name="id" value="<?php echo $plan['id']; ?>">
+                <input type="hidden" name="type" value="lesson_plan">
+                <input type="hidden" name="signature_base64" id="signatureBase64">
+                
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <canvas id="signaturePad" width="400" height="200" style="border: 2px solid #ccc; border-radius: 8px; background: #fff; touch-action: none; cursor: crosshair; max-width: 100%;"></canvas>
+                    <br>
+                    <button type="button" class="btn btn-sm" style="margin-top: 10px; background-color: #f8f9fa; border: 1px solid #ddd;" onclick="clearSignature()"><i class="fas fa-eraser"></i> ล้างกระดาน (Clear)</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">หรืออัปโหลดไฟล์รูปลายเซ็น:</label>
+                    <input type="file" name="signature_file" accept="image/*" class="form-control" style="max-width: 400px; margin: 0 auto;">
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button type="submit" class="btn-gradient" style="padding: 10px 30px; font-size: 16px;"><i class="fas fa-save"></i> ยืนยันการรับทราบ</button>
+                </div>
+            </form>
+        </div>
+    <?php else: ?>
+        <div style="background-color: #fff; border: 1px solid #eee; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px;">
+            <h3 style="margin: 0; margin-bottom: 10px; color: #333; font-size: 18px;"><i class="fas fa-signature"></i> ลายมือชื่อผู้รับการประเมิน</h3>
+            <img src="<?php echo htmlspecialchars($plan['teacher_signature_path']); ?>" alt="ลายเซ็น" style="max-width: 100%; max-height: 120px; border: 1px dashed #ccc; padding: 10px; border-radius: 5px; background: #fafafa; margin-bottom: 10px;">
+            <p style="margin: 0; font-size: 16px; color: #555;">(ลงชื่อ) <?php echo htmlspecialchars($_SESSION['name'] ?? ''); ?> (ผู้สอน)</p>
+            <p style="margin: 0; font-size: 14px; color: #888;">วันที่รับทราบ: <?php echo date('d/m/Y H:i', strtotime($plan['teacher_signed_at'])); ?></p>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="export_lesson_plan_pdf.php?id=<?php echo $plan['id']; ?>" target="_blank" class="btn-gradient hide-on-print" 
+               style="display: inline-block; background: linear-gradient(135deg, #2c3e50, #3498db); text-decoration: none; padding: 10px 20px; color: white; border-radius: 5px;"><i class="fas fa-file-pdf"></i> พิมพ์ผลการประเมิน (PDF)</a>
+        </div>
+    <?php endif; ?>
 </div>
 
-<div style="text-align: center; margin-top: 20px;">
-    <a href="export_lesson_plan_pdf.php?id=<?php echo $plan['id']; ?>" target="_blank" class="btn-gradient hide-on-print" 
-       style="display: inline-block; background: linear-gradient(135deg, #2c3e50, #3498db); text-decoration: none; padding: 10px 20px; color: white; border-radius: 5px;"><i class="fas fa-file-pdf"></i> พิมพ์ผลการประเมิน (PDF)</a>
-</div>
+<script>
+    // Setup Signature Pad if exists
+    const canvas = document.getElementById('signaturePad');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            if (e.touches && e.touches.length > 0) {
+                return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+            }
+            return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+        };
+
+        const startDrawing = (e) => {
+            drawing = true;
+            const pos = getPos(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            e.preventDefault(); 
+        };
+
+        const draw = (e) => {
+            if (!drawing) return;
+            const pos = getPos(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            e.preventDefault();
+        };
+
+        const stopDrawing = (e) => {
+            if (!drawing) return;
+            drawing = false;
+            ctx.closePath();
+            document.getElementById('signatureBase64').value = canvas.toDataURL('image/png');
+            if (e) e.preventDefault();
+        };
+
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        canvas.addEventListener('touchstart', startDrawing, { passive: false });
+        canvas.addEventListener('touchmove', draw, { passive: false });
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
+    }
+
+    function clearSignature() {
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('signatureBase64').value = "";
+    }
+
+    const form = document.getElementById('teacherSignForm');
+    if(form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const sigBase64 = document.getElementById('signatureBase64').value;
+            const fileInput = document.querySelector('input[name="signature_file"]');
+            
+            let hasBlankCanvas = true;
+            if(canvas) {
+                const blankCanvas = document.createElement('canvas');
+                blankCanvas.width = canvas.width;
+                blankCanvas.height = canvas.height;
+                const bCtx = blankCanvas.getContext('2d');
+                bCtx.fillStyle = "white";
+                bCtx.fillRect(0, 0, blankCanvas.width, blankCanvas.height);
+                hasBlankCanvas = (sigBase64 === blankCanvas.toDataURL('image/png') || sigBase64 === "");
+            }
+            
+            if (hasBlankCanvas && fileInput.files.length === 0) {
+                Swal.fire('ข้อผิดพลาด', 'กรุณาเซ็นชื่อรับทราบ หรืออัปโหลดไฟล์รูปลายเซ็น', 'warning');
+                return;
+            }
+
+            Swal.fire({
+                title: 'กำลังบันทึก...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            fetch('teacher_sign_action.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกสำเร็จ',
+                        text: 'ระบบได้บันทึกลายเซ็นของคุณเรียบร้อยแล้ว',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire('ข้อผิดพลาด', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+            });
+        });
+    }
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
