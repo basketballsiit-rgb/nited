@@ -207,23 +207,44 @@ $html .= '<table class="signature-area"><tr>';
 
 // Left: Teacher
 $html .= '<td style="width: 50%;" class="sig-box">';
-$html .= '<br><br>';
-$html .= '(ลงชื่อ) ....................................................... <br>';
+$html .= '<table style="width: 100%; border: none; margin-top: 20px;">';
+$html .= '<tr>';
+$html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0;">(ลงชื่อ)</td>';
+$html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0;">';
+$html .= '...................................................';
+$html .= '</td>';
+$html .= '</tr>';
+$html .= '<tr>';
+$html .= '<td style="border: none; padding: 0;"></td>';
+$html .= '<td style="text-align: center; border: none; padding: 0;">';
 $html .= '(' . $teacher_name . ')<br>';
 $html .= 'ผู้จัดทำแผนการจัดการเรียนรู้';
+$html .= '</td>';
+$html .= '</tr>';
+$html .= '</table>';
 $html .= '</td>';
 
 // Right: Reviewer
 $html .= '<td style="width: 50%;" class="sig-box">';
+$html .= '<table style="width: 100%; border: none; margin-top: 20px;">';
+$html .= '<tr>';
+$html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0;">(ลงชื่อ)</td>';
+$html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0;">';
 if (!empty($sig_local) && file_exists($sig_local)) {
-    $html .= '<br>';
-    $html .= '(ลงชื่อ) <img src="' . $sig_local . '" style="max-height: 70px; max-width: 180px; vertical-align: middle;"> <br>';
+    $html .= '<img src="' . $sig_local . '" style="max-height: 60px; max-width: 160px;">';
 } else {
-    $html .= '<br><br>';
-    $html .= '(ลงชื่อ) ....................................................... <br>';
+    $html .= '...................................................';
 }
+$html .= '</td>';
+$html .= '</tr>';
+$html .= '<tr>';
+$html .= '<td style="border: none; padding: 0;"></td>';
+$html .= '<td style="text-align: center; border: none; padding: 0;">';
 $html .= '(' . $reviewer_name . ')<br>';
 $html .= 'ผู้ตรวจ/ประเมินแผนฯ';
+$html .= '</td>';
+$html .= '</tr>';
+$html .= '</table>';
 $html .= '</td>';
 
 $html .= '</tr></table>';
