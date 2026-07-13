@@ -207,7 +207,7 @@ $html .= '<table class="signature-area"><tr>';
 
 // Left: Teacher
 $html .= '<td style="width: 50%;" class="sig-box">';
-$html .= '<table style="width: 100%; border: none; margin-top: 20px;">';
+$html .= '<table style="width: 100%; border: none; margin-top: 20px; font-size: 12pt; font-weight: bold;">';
 $html .= '<tr>';
 $html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0;">(ลงชื่อ)</td>';
 $html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0;">';
@@ -226,7 +226,7 @@ $html .= '</td>';
 
 // Right: Reviewer
 $html .= '<td style="width: 50%;" class="sig-box">';
-$html .= '<table style="width: 100%; border: none; margin-top: 20px;">';
+$html .= '<table style="width: 100%; border: none; margin-top: 20px; font-size: 12pt; font-weight: bold;">';
 $html .= '<tr>';
 $html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0;">(ลงชื่อ)</td>';
 $html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0;">';
