@@ -65,7 +65,11 @@ $teacher_name = htmlspecialchars($plan['teacher_name'] ?? '-');
 $term = htmlspecialchars($plan['term'] ?? '-');
 $year = htmlspecialchars($plan['year'] ?? '-');
 $reviewer_name = htmlspecialchars($plan['reviewer_name'] ?? '-');
-$signature_path = $plan['signature_path'] ? '../' . $plan['signature_path'] : '';
+$signature_path_db = $plan['signature_path'] ?? '';
+$sig_local = '';
+if (!empty($signature_path_db)) {
+    $sig_local = __DIR__ . '/../' . $signature_path_db;
+}
 $review_comment = htmlspecialchars($plan['review_comment'] ?? '');
 
 $html = '
@@ -210,10 +214,10 @@ $html .= '</td>';
 
 // Right: Reviewer
 $html .= '<td style="width: 50%;" class="sig-box">';
-if ($signature_path && file_exists($signature_path)) {
-    $html .= '<img src="' . $signature_path . '" style="height: 45px; max-width: 200px;"><br>';
+if (!empty($sig_local) && file_exists($sig_local)) {
+    $html .= '<img src="' . $sig_local . '" style="height: 45px; max-width: 200px;"><br>';
 } else {
-    $html .= '<br><br>';
+    $html .= '<br><br><br>';
 }
 $html .= '(ลงชื่อ)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>';
 $html .= '(' . $reviewer_name . ')<br>';

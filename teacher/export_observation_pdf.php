@@ -78,8 +78,11 @@ $date = date('d/m/Y', strtotime($supervision['scheduled_date']));
 $start_time = date('H:i', strtotime($supervision['scheduled_date']));
 $end_time = date('H:i', strtotime($supervision['end_time']));
 $supervisor_name = htmlspecialchars($supervision['supervisor_name'] ?? '-');
-$signature_path = $supervision['signature_path'] ? '../' . $supervision['signature_path'] : '';
-
+$signature_path_db = $supervision['signature_path'] ?? '';
+$sig_local = '';
+if (!empty($signature_path_db)) {
+    $sig_local = __DIR__ . '/../' . $signature_path_db;
+}
 
 $html = '
 <style>
@@ -222,8 +225,8 @@ $html .= '</td>';
 
 // Right: Supervisor
 $html .= '<td style="width: 50%;" class="sig-box">';
-if ($signature_path && file_exists($signature_path)) {
-    $html .= '<img src="' . $signature_path . '" style="height: 50px; max-width: 200px;"><br>';
+if (!empty($sig_local) && file_exists($sig_local)) {
+    $html .= '<img src="' . $sig_local . '" style="height: 50px; max-width: 200px;"><br>';
 } else {
     $html .= '<br><br><br>';
 }
