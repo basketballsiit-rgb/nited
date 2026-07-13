@@ -218,16 +218,16 @@ $html .= '<table class="signature-area"><tr>';
 
 // Left: Teacher
 $html .= '<td style="width: 50%;" class="sig-box">';
-$html .= '<table style="width: 100%; border: none; margin-top: 20px; font-size: 12pt; font-weight: bold;">';
+$html .= '<table style="width: 100%; border: none; margin-top: 20px;">';
 $html .= '<tr>';
-$html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0;">(ลงชื่อ)</td>';
-$html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0;">';
+$html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0; font-size: 11pt; font-weight: normal;">(ลงชื่อ)</td>';
+$html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0; font-size: 11pt; font-weight: normal;">';
 $html .= '...................................................';
 $html .= '</td>';
 $html .= '</tr>';
 $html .= '<tr>';
 $html .= '<td style="border: none; padding: 0;"></td>';
-$html .= '<td style="text-align: center; border: none; padding: 0;">';
+$html .= '<td style="text-align: center; border: none; padding: 0; font-size: 11pt; font-weight: normal;">';
 $html .= '(' . $teacher_name . ')<br>';
 $html .= 'ครูผู้สอน / ผู้รับการนิเทศ';
 $html .= '</td>';
@@ -237,12 +237,12 @@ $html .= '</td>';
 
 // Right: Supervisor
 $html .= '<td style="width: 50%;" class="sig-box">';
-$html .= '<table style="width: 100%; border: none; margin-top: 20px; font-size: 12pt; font-weight: bold;">';
+$html .= '<table style="width: 100%; border: none; margin-top: 20px;">';
 $html .= '<tr>';
-$html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0;">(ลงชื่อ)</td>';
-$html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0;">';
+$html .= '<td style="width: 25%; text-align: right; vertical-align: middle; border: none; padding: 0; font-size: 11pt; font-weight: normal;">(ลงชื่อ)</td>';
+$html .= '<td style="width: 75%; text-align: center; vertical-align: middle; border: none; padding: 0; font-size: 11pt; font-weight: normal;">';
 if (!empty($sig_local) && file_exists($sig_local)) {
-    $html .= '<img src="' . $sig_local . '" style="max-height: 60px; max-width: 160px;">';
+    $html .= '<img src="' . $sig_local . '" style="max-height: 50px; max-width: 150px;">';
 } else {
     $html .= '...................................................';
 }
@@ -250,7 +250,7 @@ $html .= '</td>';
 $html .= '</tr>';
 $html .= '<tr>';
 $html .= '<td style="border: none; padding: 0;"></td>';
-$html .= '<td style="text-align: center; border: none; padding: 0;">';
+$html .= '<td style="text-align: center; border: none; padding: 0; font-size: 11pt; font-weight: normal;">';
 $html .= '(' . $supervisor_name . ')<br>';
 $html .= 'กรรมการนิเทศ';
 $html .= '</td>';
