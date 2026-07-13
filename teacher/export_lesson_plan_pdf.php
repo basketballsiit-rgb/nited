@@ -208,21 +208,22 @@ $html .= '<table class="signature-area"><tr>';
 // Left: Teacher
 $html .= '<td style="width: 50%;" class="sig-box">';
 $html .= '<br><br>';
-$html .= '(ลงชื่อ)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>';
+$html .= '(ลงชื่อ) ....................................................... <br>';
 $html .= '(' . $teacher_name . ')<br>';
-$html .= 'ผู้ส่งแผนการสอน / ครูผู้สอน';
+$html .= 'ผู้จัดทำแผนการจัดการเรียนรู้';
 $html .= '</td>';
 
 // Right: Reviewer
 $html .= '<td style="width: 50%;" class="sig-box">';
 if (!empty($sig_local) && file_exists($sig_local)) {
-    $html .= '<img src="' . $sig_local . '" style="height: 45px; max-width: 200px;"><br>';
+    $html .= '<br>';
+    $html .= '(ลงชื่อ) <img src="' . $sig_local . '" style="max-height: 70px; max-width: 180px; vertical-align: middle;"> <br>';
 } else {
-    $html .= '<br><br><br>';
+    $html .= '<br><br>';
+    $html .= '(ลงชื่อ) ....................................................... <br>';
 }
-$html .= '(ลงชื่อ)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>';
 $html .= '(' . $reviewer_name . ')<br>';
-$html .= 'ผู้ตรวจ / ผู้ประเมิน';
+$html .= 'ผู้ตรวจ/ประเมินแผนฯ';
 $html .= '</td>';
 
 $html .= '</tr></table>';

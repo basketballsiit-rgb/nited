@@ -218,8 +218,8 @@ $html .= '<table class="signature-area"><tr>';
 
 // Left: Teacher
 $html .= '<td style="width: 50%;" class="sig-box">';
-$html .= '<br><br><br>';
-$html .= '(ลงชื่อ)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>';
+$html .= '<br><br>';
+$html .= '(ลงชื่อ) ....................................................... <br>';
 $html .= '(' . $teacher_name . ')<br>';
 $html .= 'ครูผู้สอน / ผู้รับการนิเทศ';
 $html .= '</td>';
@@ -227,11 +227,12 @@ $html .= '</td>';
 // Right: Supervisor
 $html .= '<td style="width: 50%;" class="sig-box">';
 if (!empty($sig_local) && file_exists($sig_local)) {
-    $html .= '<img src="' . $sig_local . '" style="height: 50px; max-width: 200px;"><br>';
+    $html .= '<br>';
+    $html .= '(ลงชื่อ) <img src="' . $sig_local . '" style="max-height: 70px; max-width: 180px; vertical-align: middle;"> <br>';
 } else {
-    $html .= '<br><br><br>';
+    $html .= '<br><br>';
+    $html .= '(ลงชื่อ) ....................................................... <br>';
 }
-$html .= '(ลงชื่อ)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>';
 $html .= '(' . $supervisor_name . ')<br>';
 $html .= 'กรรมการนิเทศ';
 $html .= '</td>';
