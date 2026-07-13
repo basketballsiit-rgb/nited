@@ -41,7 +41,7 @@ $all_departments = $stmt_dept->fetchAll(PDO::FETCH_COLUMN);
                     <option value="ข้าราชการครู">ข้าราชการครู</option>
                     <option value="พนักงานราชการ">พนักงานราชการ</option>
                     <option value="ครูพิเศษสอน">ครูพิเศษสอน</option>
-                    <option value="ครูอัตราจ้าง">ครูอัตราจ้าง</option>
+
                     <option value="ผู้บริหาร">ผู้บริหาร</option>
                 </select>
             </div>
