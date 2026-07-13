@@ -167,28 +167,28 @@ $html .= '<table class="signature-area" style="border: none;"><tr>';
 
 // Left: Supervisor receiving the schedule
 $html .= '<td style="width: 50%; border: none;" class="sig-box">';
-$html .= '<table style="width: 100%; border: none;">';
+$html .= '<table style="margin: 0 auto; border: none; width: 90%;">';
 $html .= '<tr>';
-$html .= '<td style="width: 25%; text-align: right; border: none; padding: 0;">(ลงชื่อ)</td>';
-$html .= '<td style="width: 75%; text-align: center; border: none; padding: 0;">...................................................</td>';
+$html .= '<td style="width: 25%; text-align: right; border: none; padding-right: 5px;">(ลงชื่อ)</td>';
+$html .= '<td style="width: 75%; text-align: left; border: none; padding: 0;">.........................................................</td>';
 $html .= '</tr>';
 $html .= '<tr>';
 $html .= '<td style="border: none; padding: 0;"></td>';
-$html .= '<td style="text-align: center; border: none; padding: 0;">(' . $sup_name . ')<br>กรรมการนิเทศ/ผู้ประเมิน</td>';
+$html .= '<td style="text-align: center; border: none; padding: 0; padding-top: 5px;">(' . $sup_name . ')<br>กรรมการนิเทศ/ผู้ประเมิน</td>';
 $html .= '</tr>';
 $html .= '</table>';
 $html .= '</td>';
 
 // Right: Head of Academic or similar
 $html .= '<td style="width: 50%; border: none;" class="sig-box">';
-$html .= '<table style="width: 100%; border: none;">';
+$html .= '<table style="margin: 0 auto; border: none; width: 90%;">';
 $html .= '<tr>';
-$html .= '<td style="width: 25%; text-align: right; border: none; padding: 0;">(ลงชื่อ)</td>';
-$html .= '<td style="width: 75%; text-align: center; border: none; padding: 0;">...................................................</td>';
+$html .= '<td style="width: 25%; text-align: right; border: none; padding-right: 5px;">(ลงชื่อ)</td>';
+$html .= '<td style="width: 75%; text-align: left; border: none; padding: 0;">.........................................................</td>';
 $html .= '</tr>';
 $html .= '<tr>';
 $html .= '<td style="border: none; padding: 0;"></td>';
-$html .= '<td style="text-align: center; border: none; padding: 0;">(...................................................)<br>หัวหน้างาน/ฝ่ายวิชาการ</td>';
+$html .= '<td style="text-align: center; border: none; padding: 0; padding-top: 5px;">(.........................................................)<br>หัวหน้างาน/ฝ่ายวิชาการ</td>';
 $html .= '</tr>';
 $html .= '</table>';
 $html .= '</td>';
