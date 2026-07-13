@@ -85,8 +85,9 @@ $html = '
     }
     th, td {
         border: 1px solid #000;
-        padding: 8px 5px;
+        padding: 12px 5px;
         vertical-align: middle;
+        white-space: nowrap;
     }
     th {
         font-weight: bold;
