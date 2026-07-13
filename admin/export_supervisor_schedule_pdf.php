@@ -63,18 +63,19 @@ $html = '
 <style>
     body {
         font-family: "sarabun", sans-serif;
-        font-size: 16pt;
+        font-size: 11pt;
         color: #000;
         line-height: 1.4;
     }
     .header {
         text-align: center;
-        font-size: 18pt;
+        font-size: 16pt;
         font-weight: bold;
         margin-bottom: 20px;
     }
     .sub-header {
         text-align: center;
+        font-size: 14pt;
         margin-bottom: 30px;
     }
     table {
@@ -101,7 +102,7 @@ $html = '
     }
     .sig-box {
         text-align: center;
-        font-size: 16pt;
+        font-size: 11pt;
         line-height: 1.5;
     }
 </style>
@@ -119,12 +120,12 @@ $html .= '</div>';
 
 $html .= '<table>';
 $html .= '<thead><tr>';
-$html .= '<th style="width: 8%;">ลำดับ</th>';
-$html .= '<th style="width: 20%;">วัน/เดือน/ปี</th>';
+$html .= '<th style="width: 10%;">ลำดับ</th>';
+$html .= '<th style="width: 18%;">วัน/เดือน/ปี</th>';
 $html .= '<th style="width: 15%;">เวลา</th>';
-$html .= '<th style="width: 25%;">ครูผู้รับการนิเทศ</th>';
-$html .= '<th style="width: 22%;">รหัส-ชื่อรายวิชา</th>';
-$html .= '<th style="width: 10%;">ระดับชั้น</th>';
+$html .= '<th style="width: 22%;">ครูผู้รับการนิเทศ</th>';
+$html .= '<th style="width: 23%;">รหัส-ชื่อรายวิชา</th>';
+$html .= '<th style="width: 12%;">ระดับชั้น</th>';
 $html .= '</tr></thead>';
 $html .= '<tbody>';
 
