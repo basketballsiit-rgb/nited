@@ -189,7 +189,7 @@ if ($is_already_evaluated) {
             <h4 style="margin-top: 0; color: #333;"><i class="fas fa-comment-dots"></i> สรุปผลการประเมินและภาพรวม</h4>
             
             <div style="margin-bottom: 15px;">
-                <label style="display: block; margin-bottom: 5px; font-weight: bold;">ผลการพิเคราะห์:</label>
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">ผลการวิเคราะห์:</label>
                 <?php if ($is_already_evaluated && $plan['status'] !== 'draft'): ?>
                     <input type="text" readonly class="form-control" value="<?php echo ($plan['status']==='approved' ? 'อนุมัติ / ผ่าน' : ($plan['status']==='revision' ? 'ส่งกลับไปแก้ไข' : 'ไม่อนุมัติ')); ?>">
                 <?php else: ?>

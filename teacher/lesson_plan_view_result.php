@@ -78,7 +78,7 @@ foreach ($res as $r) {
                 padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid <?php echo ($plan['status'] === 'approved') ? '#badbcc' : (($plan['status'] === 'revision') ? '#ffeeba' : '#f5c2c7'); ?>;">
         <h3 style="margin-top: 0; margin-bottom: 5px;">
             <i class="fas <?php echo ($plan['status'] === 'approved') ? 'fa-check-circle' : (($plan['status'] === 'revision') ? 'fa-exclamation-triangle' : 'fa-times-circle'); ?>"></i> 
-            ผลการพิจารณา: 
+            ผลการวิเคราะห์: 
             <?php 
                 if ($plan['status'] === 'approved') echo "ผ่านการอนุมัติ";
                 elseif ($plan['status'] === 'revision') echo "ส่งกลับไปปรับปรุงแก้ไข";

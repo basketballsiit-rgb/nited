@@ -200,7 +200,7 @@ $status_text = "ผ่านการอนุมัติ";
 if ($plan['status'] === 'revision') $status_text = "ส่งกลับไปปรับปรุงแก้ไข";
 if ($plan['status'] === 'rejected') $status_text = "ไม่ผ่านการอนุมัติ";
 
-$html .= '<div style="margin-top:10px; font-weight:bold; text-align: center;">สรุปผลการพิจารณา: ' . $status_text . '</div>';
+$html .= '<div style="margin-top:10px; font-weight:bold; text-align: center;">สรุปผลการวิเคราะห์: ' . $status_text . '</div>';
 
 // Signature
 $html .= '<table class="signature-area"><tr>';
