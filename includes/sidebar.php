@@ -30,6 +30,9 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
             <li><a href="/nited/admin/academic_years.php"
                     class="<?php echo ($current_dir == 'admin' && $current_page == 'academic_years.php') ? 'active' : ''; ?>"><i
                         class="fas fa-calendar-alt"></i> ปีการศึกษา</a></li>
+            <li><a href="/nited/admin/supervisor_schedules.php"
+                    class="<?php echo ($current_dir == 'admin' && $current_page == 'supervisor_schedules.php') ? 'active' : ''; ?>"><i
+                        class="fas fa-calendar-day"></i> ตารางการนิเทศรายบุคคล</a></li>
         <?php elseif ($role === 'teacher'): ?>
             <li><a href="/nited/teacher/dashboard.php"
                     class="<?php echo ($current_dir == 'teacher' && $current_page == 'dashboard.php') ? 'active' : ''; ?>"><i
