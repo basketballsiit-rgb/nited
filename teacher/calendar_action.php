@@ -246,6 +246,54 @@ try {
             'assigned_supervisor' => $selected_name
         ]);
 
+    } elseif ($action === 'upload_lesson_plan') {
+        $id = $_POST['id'] ?? '';
+        
+        // Verify ownership and status
+        $stmt = $pdo->prepare("SELECT id, lesson_plan_file FROM supervisions WHERE id = ? AND teacher_id = ? AND status != 'completed'");
+        $stmt->execute([$id, $teacher_id]);
+        $sup = $stmt->fetch();
+        
+        if (!$sup) {
+            echo json_encode(['status' => 'error', 'message' => 'ไม่พบข้อมูล หรือรายการนี้ไม่สามารถแก้ไขแผนการสอนได้แล้ว']);
+            exit;
+        }
+
+        if (isset($_FILES['lesson_plan_file']) && $_FILES['lesson_plan_file']['error'] === UPLOAD_ERR_OK) {
+            $upload_dir = __DIR__ . '/../uploads/lesson_plans/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+            $file_extension = strtolower(pathinfo($_FILES['lesson_plan_file']['name'], PATHINFO_EXTENSION));
+            
+            // Basic validation
+            if (!in_array($file_extension, ['pdf', 'doc', 'docx'])) {
+                echo json_encode(['status' => 'error', 'message' => 'รองรับเฉพาะไฟล์ PDF, DOC, DOCX เท่านั้น']);
+                exit;
+            }
+
+            $new_filename = 'plan_' . time() . '_' . rand(1000, 9999) . '.' . $file_extension;
+            $destination = $upload_dir . $new_filename;
+            
+            if (move_uploaded_file($_FILES['lesson_plan_file']['tmp_name'], $destination)) {
+                $lesson_plan_path = 'uploads/lesson_plans/' . $new_filename;
+                
+                // Delete old file if exists
+                if (!empty($sup['lesson_plan_file']) && file_exists(__DIR__ . '/../' . $sup['lesson_plan_file'])) {
+                    unlink(__DIR__ . '/../' . $sup['lesson_plan_file']);
+                }
+
+                // Update database
+                $stmt = $pdo->prepare("UPDATE supervisions SET lesson_plan_file = ? WHERE id = ?");
+                $stmt->execute([$lesson_plan_path, $id]);
+
+                echo json_encode(['status' => 'success', 'message' => 'อัปโหลดแผนการสอนสำเร็จ', 'file_path' => $lesson_plan_path]);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์']);
+            }
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'กรุณาเลือกไฟล์แผนการสอน']);
+        }
     }
 } catch (PDOException $e) {
     echo json_encode(['status' => 'error', 'message' => 'Database Error: ' . $e->getMessage()]);

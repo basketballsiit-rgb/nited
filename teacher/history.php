@@ -72,7 +72,10 @@ $history = $stmt->fetchAll();
                                     style="padding: 5px 10px; font-size: 12px; text-decoration: none;"><i
                                         class="fas fa-search"></i> ดูผล</a>
                             <?php else: ?>
-                                <span style="color: #ccc;">-</span>
+                                <button onclick="uploadLessonPlan(<?php echo $h['id']; ?>)" class="btn-gradient"
+                                    style="padding: 5px 10px; font-size: 12px; border: none; cursor: pointer; background: linear-gradient(135deg, #17a2b8, #138496);">
+                                    <i class="fas fa-upload"></i> <?php echo empty($h['lesson_plan_file']) ? 'เพิ่มแผนฯ' : 'แก้ไขแผนฯ'; ?>
+                                </button>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -85,4 +88,69 @@ $history = $stmt->fetchAll();
             </tbody>
         </table>
     </div>
-</div><?php require_once __DIR__ . '/../includes/footer.php'; ?>
+</div>
+
+<script>
+function uploadLessonPlan(id) {
+    Swal.fire({
+        title: 'อัปโหลดแผนการสอน',
+        html: `
+            <p class="text-muted" style="font-size: 14px; text-align: left; margin-bottom: 10px;">กรุณาเลือกไฟล์แผนการสอน (รองรับเฉพาะ PDF, DOC, DOCX)</p>
+            <input type="file" id="lessonPlanFile" class="swal2-file" accept=".pdf,.doc,.docx" style="display: flex;">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'อัปโหลด',
+        cancelButtonText: 'ยกเลิก',
+        preConfirm: () => {
+            const file = document.getElementById('lessonPlanFile').files[0];
+            if (!file) {
+                Swal.showValidationMessage('กรุณาเลือกไฟล์');
+                return false;
+            }
+            return file;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const file = result.value;
+            const formData = new FormData();
+            formData.append('action', 'upload_lesson_plan');
+            formData.append('id', id);
+            formData.append('lesson_plan_file', file);
+
+            Swal.fire({
+                title: 'กำลังอัปโหลด...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('calendar_action.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('ข้อผิดพลาด', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+            });
+        }
+    });
+}
+</script>
+
+<?php require_once __DIR__ . '/../includes/footer.php'; ?>
