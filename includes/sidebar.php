@@ -33,6 +33,9 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
             <li><a href="/nited/admin/supervisor_schedules.php"
                     class="<?php echo ($current_dir == 'admin' && $current_page == 'supervisor_schedules.php') ? 'active' : ''; ?>"><i
                         class="fas fa-calendar-day"></i> ตารางการนิเทศรายบุคคล</a></li>
+            <li><a href="/nited/admin/manuals.php"
+                    class="<?php echo ($current_dir == 'admin' && $current_page == 'manuals.php') ? 'active' : ''; ?>"><i
+                        class="fas fa-book"></i> จัดการคู่มือการใช้งาน</a></li>
         <?php elseif ($role === 'teacher'): ?>
             <li><a href="/nited/teacher/dashboard.php"
                     class="<?php echo ($current_dir == 'teacher' && $current_page == 'dashboard.php') ? 'active' : ''; ?>"><i
@@ -49,6 +52,12 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
             <li><a href="/nited/teacher/lesson_plans.php"
                     class="<?php echo ($current_dir == 'teacher' && $current_page == 'lesson_plans.php') ? 'active' : ''; ?>"><i
                         class="fas fa-file-upload"></i> ส่งแผนการจัดการเรียนรู้</a></li>
+            <li class="sidebar-header"
+                style="padding: 10px 15px; font-size: 12px; color: #aaa; text-transform: uppercase; margin-top: 10px;">
+                อื่นๆ</li>
+            <li><a href="/nited/teacher/manuals.php"
+                    class="<?php echo ($current_dir == 'teacher' && $current_page == 'manuals.php') ? 'active' : ''; ?>"><i
+                        class="fas fa-book"></i> คู่มือการใช้งาน</a></li>
         <?php elseif ($role === 'supervisor'): ?>
             <li><a href="/nited/supervisor/dashboard.php"
                     class="<?php echo ($current_dir == 'supervisor' && $current_page == 'dashboard.php') ? 'active' : ''; ?>"><i
@@ -71,6 +80,12 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
             <li><a href="/nited/teacher/lesson_plans.php"
                     class="<?php echo ($current_dir == 'teacher' && $current_page == 'lesson_plans.php') ? 'active' : ''; ?>"><i
                         class="fas fa-file-upload"></i> ส่งแผนการจัดการเรียนรู้</a></li>
+            <li class="sidebar-header"
+                style="padding: 10px 15px; font-size: 12px; color: #aaa; text-transform: uppercase; margin-top: 10px;">
+                อื่นๆ</li>
+            <li><a href="/nited/supervisor/manuals.php"
+                    class="<?php echo ($current_dir == 'supervisor' && $current_page == 'manuals.php') ? 'active' : ''; ?>"><i
+                        class="fas fa-book"></i> คู่มือการใช้งาน</a></li>
         <?php elseif ($role === 'executive'): ?>
             <li><a href="/nited/executive/dashboard.php"
                     class="<?php echo ($current_dir == 'executive' && $current_page == 'dashboard.php') ? 'active' : ''; ?>"><i
@@ -100,6 +115,12 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
             <li><a href="/nited/supervisor/lesson_plans_review.php"
                     class="<?php echo ($current_dir == 'supervisor' && $current_page == 'lesson_plans_review.php') ? 'active' : ''; ?>"><i
                         class="fas fa-file-signature"></i> ตรวจแผนการจัดการเรียนรู้</a></li>
+            <li class="sidebar-header"
+                style="padding: 10px 15px; font-size: 12px; color: #aaa; text-transform: uppercase; margin-top: 10px;">
+                อื่นๆ</li>
+            <li><a href="/nited/supervisor/manuals.php"
+                    class="<?php echo ($current_dir == 'supervisor' && $current_page == 'manuals.php') ? 'active' : ''; ?>"><i
+                        class="fas fa-book"></i> คู่มือการใช้งาน</a></li>
         <?php endif; ?>
     </ul>
 </div>
