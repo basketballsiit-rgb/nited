@@ -230,14 +230,14 @@ try {
         // Insert Supervision Request
         $stmt = $pdo->prepare("
             INSERT INTO supervisions (teacher_id, supervisor_id, academic_year_id, subject_code, subject_name, level, teaching_department, scheduled_date, end_time, status, lesson_plan_file)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved', ?)
         ");
         $stmt->execute([$teacher_id, $selected_supervisor_id, $year_id, $subject_code, $subject, $level, $teaching_department, $start_dt, $end_dt, $lesson_plan_path]);
 
         // Send notification to the assigned supervisor
         $teacher_name = $_SESSION['name'];
-        $title = "คำขอรับการนิเทศใหม่";
-        $message = "คุณ {$teacher_name} ได้ส่งคำขอรับการนิเทศวิชา {$subject} กรุณาตรวจสอบและยืนยันเวลา";
+        $title = "ได้รับการจัดตารางนิเทศใหม่ (ระบบอนุมัติอัตโนมัติ)";
+        $message = "ระบบได้จัดตารางการนิเทศวิชา {$subject} ของคุณ {$teacher_name} ในเวลาที่คุณว่างเรียบร้อยแล้ว";
         $link = "/nited/supervisor/calendar.php";
         addNotification($pdo, $selected_supervisor_id, $title, $message, $link);
 
