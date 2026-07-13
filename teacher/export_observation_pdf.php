@@ -81,7 +81,8 @@ $supervisor_name = htmlspecialchars($supervision['supervisor_name'] ?? '-');
 $signature_path_db = $supervision['signature_path'] ?? '';
 $sig_local = '';
 if (!empty($signature_path_db)) {
-    $sig_local = __DIR__ . '/../' . $signature_path_db;
+    $clean_path = preg_replace('#^/nited/#', '', $signature_path_db);
+    $sig_local = __DIR__ . '/../' . $clean_path;
 }
 
 $html = '

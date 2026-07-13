@@ -68,7 +68,8 @@ $reviewer_name = htmlspecialchars($plan['reviewer_name'] ?? '-');
 $signature_path_db = $plan['signature_path'] ?? '';
 $sig_local = '';
 if (!empty($signature_path_db)) {
-    $sig_local = __DIR__ . '/../' . $signature_path_db;
+    $clean_path = preg_replace('#^/nited/#', '', $signature_path_db);
+    $sig_local = __DIR__ . '/../' . $clean_path;
 }
 $review_comment = htmlspecialchars($plan['review_comment'] ?? '');
 
