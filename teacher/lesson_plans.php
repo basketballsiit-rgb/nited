@@ -65,8 +65,8 @@ $lesson_plans = $stmt->fetchAll();
                 </select>
             </div>
             <div style="flex: 2; min-width: 250px;">
-                <label style="display: block; margin-bottom: 8px; font-weight: bold;">ไฟล์แผนการสอน (PDF/Word/ZIP) <span style="color:red">*</span></label>
-                <input type="file" name="lesson_plan_file" class="form-control" accept=".pdf,.doc,.docx,.zip" required>
+                <label style="display: block; margin-bottom: 8px; font-weight: bold;">ไฟล์แผนการสอน (PDF/Word) <span style="color:red">*</span></label>
+                <input type="file" name="lesson_plan_file" class="form-control" accept=".pdf,.doc,.docx" required>
             </div>
         </div>
         

@@ -99,9 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $file_extension = strtolower(pathinfo($_FILES['lesson_plan_file']['name'], PATHINFO_EXTENSION));
             
             // Basic security check on extension
-            $allowed = ['pdf', 'doc', 'docx', 'zip'];
+            $allowed = ['pdf', 'doc', 'docx'];
             if (!in_array($file_extension, $allowed)) {
-                echo json_encode(['status' => 'error', 'message' => 'ประเภทไฟล์ไม่รองรับ อนุญาตเฉพาะ PDF, Word หรือ ZIP']);
+                echo json_encode(['status' => 'error', 'message' => 'ประเภทไฟล์ไม่รองรับ อนุญาตเฉพาะ PDF หรือ Word เท่านั้น']);
                 exit;
             }
 
