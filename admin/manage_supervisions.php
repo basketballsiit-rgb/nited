@@ -61,23 +61,35 @@ require_once __DIR__ . '/../includes/header.php';
     </form>
 </div>
 
+<style>
+    .supervisions-table th, .supervisions-table td {
+        font-size: 13px;
+        white-space: nowrap;
+        vertical-align: middle;
+        padding: 8px 10px;
+    }
+    .supervisions-table td:nth-child(3) {
+        white-space: normal; /* Allow subject name to wrap if really long, but usually code keeps it tight */
+    }
+</style>
+
 <div class="content-card">
     <div class="table-responsive">
-        <table>
-            <thead>
+        <table class="supervisions-table" style="width: 100%; border-collapse: collapse;">
+            <thead style="background-color: #f8f9fa;">
                 <tr>
-                    <th>วันที่/เวลา</th>
-                    <th>ครูผู้สอน</th>
-                    <th>วิชา</th>
-                    <th>กรรมการนิเทศ</th>
-                    <th>สถานะ</th>
-                    <th>จัดการ</th>
+                    <th style="border-bottom: 2px solid #ddd;">วันที่/เวลา</th>
+                    <th style="border-bottom: 2px solid #ddd;">ครูผู้สอน</th>
+                    <th style="border-bottom: 2px solid #ddd;">วิชา</th>
+                    <th style="border-bottom: 2px solid #ddd;">กรรมการนิเทศ</th>
+                    <th style="border-bottom: 2px solid #ddd;">สถานะ</th>
+                    <th style="border-bottom: 2px solid #ddd; text-align: center;">จัดการ</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (count($supervisions) > 0): ?>
                     <?php foreach ($supervisions as $s): ?>
-                        <tr>
+                        <tr style="border-bottom: 1px solid #eee;">
                             <td>
                                 <?php 
                                 echo date('d/m/Y', strtotime($s['scheduled_date'])) . '<br>';
@@ -86,23 +98,23 @@ require_once __DIR__ . '/../includes/header.php';
                             </td>
                             <td><?php echo htmlspecialchars($s['teacher_name']); ?></td>
                             <td>
-                                <?php echo htmlspecialchars($s['subject_code']); ?><br>
-                                <small class="text-muted"><?php echo htmlspecialchars($s['subject_name']); ?></small>
+                                <strong><?php echo htmlspecialchars($s['subject_code']); ?></strong><br>
+                                <span style="color: #6c757d; font-size: 12px;"><?php echo htmlspecialchars($s['subject_name']); ?></span>
                             </td>
                             <td><?php echo htmlspecialchars($s['supervisor_name']); ?></td>
                             <td>
                                 <?php 
                                     $status_badges = [
-                                        'pending' => '<span style="background: #f1c40f; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 12px;">รออนุมัติ</span>',
-                                        'approved' => '<span style="background: #2ecc71; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 12px;">อนุมัติแล้ว</span>',
-                                        'rejected' => '<span style="background: #e74c3c; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 12px;">ถูกปฏิเสธ</span>',
-                                        'completed' => '<span style="background: #3498db; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 12px;">ประเมินแล้ว</span>'
+                                        'pending' => '<span style="background: #f1c40f; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; white-space: nowrap;">รออนุมัติ</span>',
+                                        'approved' => '<span style="background: #2ecc71; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; white-space: nowrap;">อนุมัติแล้ว</span>',
+                                        'rejected' => '<span style="background: #e74c3c; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; white-space: nowrap;">ถูกปฏิเสธ</span>',
+                                        'completed' => '<span style="background: #3498db; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; white-space: nowrap;">ประเมินแล้ว</span>'
                                     ];
                                     echo $status_badges[$s['status']] ?? $s['status'];
                                 ?>
                             </td>
-                            <td>
-                                <button onclick="deleteSupervision(<?php echo $s['id']; ?>)" class="btn btn-sm" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px;">
+                            <td style="text-align: center;">
+                                <button onclick="deleteSupervision(<?php echo $s['id']; ?>)" class="btn btn-sm" style="background-color: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
                                     <i class="fas fa-trash-alt"></i> ลบ/ยกเลิก
                                 </button>
                             </td>
@@ -120,28 +132,63 @@ require_once __DIR__ . '/../includes/header.php';
 
 <script>
 function deleteSupervision(id) {
-    if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลการจองนิเทศนี้?\n(การกระทำนี้ไม่สามารถย้อนกลับได้)')) {
-        fetch('supervision_action.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'action=delete&id=' + id
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert(data.message);
-                location.reload();
-            } else {
-                alert('เกิดข้อผิดพลาด: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
-        });
-    }
+    Swal.fire({
+        title: 'ยืนยันการลบข้อมูล?',
+        text: "คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลการจองนิเทศนี้? (การกระทำนี้ไม่สามารถย้อนกลับได้)",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#bdc3c7',
+        confirmButtonText: 'ใช่, ลบข้อมูลเลย!',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // แสดง Loading
+            Swal.fire({
+                title: 'กำลังลบข้อมูล...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('supervision_action.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'action=delete&id=' + id
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ!',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด!',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด!',
+                    text: 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้'
+                });
+            });
+        }
+    });
 }
 </script>
 
