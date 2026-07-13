@@ -101,6 +101,12 @@ $html = '
         margin-top: 50px;
         width: 100%;
     }
+    .sig-box td {
+        border: none;
+        padding: 5px;
+        white-space: normal;
+        line-height: 1.5;
+    }
     .sig-box {
         text-align: center;
         font-size: 11pt;
