@@ -20,20 +20,32 @@ if (!$selected_year_id && count($years) > 0) {
     if (!$selected_year_id) $selected_year_id = $years[0]['id'];
 }
 
+$search = $_GET['search'] ?? '';
+
 // Fetch supervisions for selected year
 $supervisions = [];
 if ($selected_year_id) {
-    $stmt = $pdo->prepare("
+    $query = "
         SELECT s.*, 
                t.name as teacher_name, 
                sup.name as supervisor_name
         FROM supervisions s
         JOIN users t ON s.teacher_id = t.id
         JOIN users sup ON s.supervisor_id = sup.id
-        WHERE s.academic_year_id = ?
-        ORDER BY s.scheduled_date DESC
-    ");
-    $stmt->execute([$selected_year_id]);
+        WHERE s.academic_year_id = :year_id
+    ";
+    
+    $params = [':year_id' => $selected_year_id];
+    
+    if ($search) {
+        $query .= " AND (t.name LIKE :search OR sup.name LIKE :search OR s.subject_name LIKE :search OR s.subject_code LIKE :search)";
+        $params[':search'] = '%' . $search . '%';
+    }
+    
+    $query .= " ORDER BY s.scheduled_date DESC";
+    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
     $supervisions = $stmt->fetchAll();
 }
 
@@ -52,7 +64,7 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <div class="content-card" style="margin-bottom: 20px;">
-    <form method="GET" style="display: flex; gap: 10px; align-items: center;">
+    <form method="GET" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <label for="year_id" style="font-weight: bold;">เลือกภาคเรียน/ปีการศึกษา:</label>
         <select name="year_id" id="year_id" class="form-control" style="width: 250px;" onchange="this.form.submit()">
             <?php foreach ($years as $y): ?>
@@ -62,6 +74,15 @@ require_once __DIR__ . '/../includes/header.php';
                 </option>
             <?php endforeach; ?>
         </select>
+        
+        <label for="search" style="font-weight: bold; margin-left: 15px;">ค้นหา:</label>
+        <input type="text" name="search" id="search" class="form-control" placeholder="ชื่อครู, กรรมการ, หรือวิชา..." value="<?php echo htmlspecialchars($search); ?>" style="width: 250px;">
+        <button type="submit" class="btn btn-primary" style="padding: 6px 15px; border-radius: 4px; border: none; background-color: #007bff; color: white; cursor: pointer;">
+            <i class="fas fa-search"></i> ค้นหา
+        </button>
+        <?php if ($search): ?>
+            <a href="?year_id=<?php echo $selected_year_id; ?>" class="btn btn-secondary" style="padding: 6px 15px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px;">ล้างค่า</a>
+        <?php endif; ?>
     </form>
 </div>
 
