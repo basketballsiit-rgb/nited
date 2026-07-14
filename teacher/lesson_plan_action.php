@@ -11,17 +11,24 @@ require_once __DIR__ . '/../includes/notification_helper.php';
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Check if POST data is empty but Content-Length is set (indicates post_max_size exceeded)
+    if (empty($_POST) && empty($_FILES) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+        $postMax = ini_get('post_max_size');
+        echo json_encode(['status' => 'error', 'message' => "ขนาดไฟล์ใหญ่เกินไป (เซิร์ฟเวอร์รองรับสูงสุด $postMax)"]);
+        exit;
+    }
+
     $action = $_POST['action'] ?? '';
     
     if ($action === 'submit_plan') {
         $teacher_id = $_SESSION['user_id'];
-        $year_id = intval($_POST['academic_year_id']);
+        $year_id = intval($_POST['academic_year_id'] ?? 0);
         $subject_code = trim($_POST['subject_code'] ?? '');
-        $subject_name = trim($_POST['subject_name']);
+        $subject_name = trim($_POST['subject_name'] ?? '');
         $level = trim($_POST['level'] ?? '');
 
-        if (empty($subject_name) || empty($subject_code) || empty($level) || empty($_FILES['lesson_plan_file']['name'])) {
-            echo json_encode(['status' => 'error', 'message' => 'กรุณากรอกข้อมูลให้ครบถ้วนและแนบไฟล์']);
+        if (empty($subject_name) || empty($subject_code) || empty($level)) {
+            echo json_encode(['status' => 'error', 'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน']);
             exit;
         }
 
@@ -91,32 +98,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Handle File Upload
         $lesson_plan_path = '';
-        if (isset($_FILES['lesson_plan_file']) && $_FILES['lesson_plan_file']['error'] === UPLOAD_ERR_OK) {
-            $upload_dir = __DIR__ . '/../uploads/full_lesson_plans/';
-            if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-            $file_extension = strtolower(pathinfo($_FILES['lesson_plan_file']['name'], PATHINFO_EXTENSION));
+        if (isset($_FILES['lesson_plan_file'])) {
+            $error_code = $_FILES['lesson_plan_file']['error'];
             
-            // Basic security check on extension
-            $allowed = ['pdf', 'doc', 'docx'];
-            if (!in_array($file_extension, $allowed)) {
-                echo json_encode(['status' => 'error', 'message' => 'ประเภทไฟล์ไม่รองรับ อนุญาตเฉพาะ PDF หรือ Word เท่านั้น']);
-                exit;
-            }
+            if ($error_code === UPLOAD_ERR_OK) {
+                $upload_dir = __DIR__ . '/../uploads/full_lesson_plans/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0777, true);
+                }
+                $file_extension = strtolower(pathinfo($_FILES['lesson_plan_file']['name'], PATHINFO_EXTENSION));
+                
+                // Basic security check on extension
+                $allowed = ['pdf', 'doc', 'docx'];
+                if (!in_array($file_extension, $allowed)) {
+                    echo json_encode(['status' => 'error', 'message' => 'ประเภทไฟล์ไม่รองรับ อนุญาตเฉพาะ PDF หรือ Word เท่านั้น']);
+                    exit;
+                }
 
-            $new_filename = 'fullplan_' . time() . '_' . rand(1000, 9999) . '.' . $file_extension;
-            $destination = $upload_dir . $new_filename;
-            
-            if (move_uploaded_file($_FILES['lesson_plan_file']['tmp_name'], $destination)) {
-                $lesson_plan_path = 'uploads/full_lesson_plans/' . $new_filename;
+                $new_filename = 'fullplan_' . time() . '_' . rand(1000, 9999) . '.' . $file_extension;
+                $destination = $upload_dir . $new_filename;
+                
+                if (move_uploaded_file($_FILES['lesson_plan_file']['tmp_name'], $destination)) {
+                    $lesson_plan_path = 'uploads/full_lesson_plans/' . $new_filename;
+                } else {
+                    $err = error_get_last();
+                    echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถบันทึกไฟล์ได้: ' . ($err['message'] ?? 'Unknown Error') . ' (Path: ' . $destination . ')']);
+                    exit;
+                }
+            } elseif ($error_code === UPLOAD_ERR_INI_SIZE || $error_code === UPLOAD_ERR_FORM_SIZE) {
+                $maxSize = ini_get('upload_max_filesize');
+                echo json_encode(['status' => 'error', 'message' => "ไฟล์มีขนาดใหญ่เกินไป (เซิร์ฟเวอร์รองรับสูงสุด $maxSize)"]);
+                exit;
+            } elseif ($error_code === UPLOAD_ERR_NO_FILE) {
+                echo json_encode(['status' => 'error', 'message' => 'กรุณาแนบไฟล์แผนการสอน']);
+                exit;
             } else {
-                $err = error_get_last();
-                echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถบันทึกไฟล์ได้: ' . ($err['message'] ?? 'Unknown Error') . ' (Path: ' . $destination . ')']);
+                echo json_encode(['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์ (Error Code: ' . $error_code . ')']);
                 exit;
             }
         } else {
-            echo json_encode(['status' => 'error', 'message' => 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์']);
+            echo json_encode(['status' => 'error', 'message' => 'ไม่พบข้อมูลไฟล์ที่อัปโหลด']);
             exit;
         }
 
