@@ -37,6 +37,10 @@ if ($selected_year_id) {
     $supervisions = $stmt->fetchAll();
 }
 
+// Fetch all eligible supervisors for the Edit feature
+$stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('supervisor', 'executive') ORDER BY name");
+$all_supervisors = $stmt->fetchAll();
+
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -113,9 +117,17 @@ require_once __DIR__ . '/../includes/header.php';
                                     echo $status_badges[$s['status']] ?? $s['status'];
                                 ?>
                             </td>
-                            <td style="text-align: center;">
+                            <td style="text-align: center; display: flex; gap: 5px; justify-content: center;">
+                                <?php 
+                                    $date_only = date('Y-m-d', strtotime($s['scheduled_date']));
+                                    $start_time_only = date('H:i', strtotime($s['scheduled_date']));
+                                    $end_time_only = date('H:i', strtotime($s['end_time']));
+                                ?>
+                                <button onclick="editSupervision(<?php echo $s['id']; ?>, <?php echo $s['supervisor_id']; ?>, '<?php echo $date_only; ?>', '<?php echo $start_time_only; ?>', '<?php echo $end_time_only; ?>')" class="btn btn-sm" style="background-color: #f39c12; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
+                                    <i class="fas fa-edit"></i> แก้ไข
+                                </button>
                                 <button onclick="deleteSupervision(<?php echo $s['id']; ?>)" class="btn btn-sm" style="background-color: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
-                                    <i class="fas fa-trash-alt"></i> ลบ/ยกเลิก
+                                    <i class="fas fa-trash-alt"></i> ลบ
                                 </button>
                             </td>
                         </tr>
@@ -131,6 +143,105 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <script>
+const allSupervisors = <?php echo json_encode($all_supervisors); ?>;
+
+function editSupervision(id, currentSupervisorId, currentDate, currentStartTime, currentEndTime) {
+    let optionsHtml = '';
+    allSupervisors.forEach(sup => {
+        let selected = (sup.id == currentSupervisorId) ? 'selected' : '';
+        optionsHtml += `<option value="${sup.id}" ${selected}>${sup.name}</option>`;
+    });
+
+    Swal.fire({
+        title: 'แก้ไขข้อมูลการจองนิเทศ',
+        html: `
+            <div style="text-align: left;">
+                <label style="font-weight: bold; font-size: 14px;">กรรมการนิเทศ:</label>
+                <select id="editSupervisor" class="swal2-select" style="display: flex; width: 100%; font-size: 14px; margin-bottom: 10px;">
+                    ${optionsHtml}
+                </select>
+                <label style="font-weight: bold; font-size: 14px;">วันที่:</label>
+                <input type="date" id="editDate" class="swal2-input" value="${currentDate}" style="display: flex; width: 90%; font-size: 14px; margin-bottom: 10px;">
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label style="font-weight: bold; font-size: 14px;">เวลาเริ่ม:</label>
+                        <input type="time" id="editStartTime" class="swal2-input" value="${currentStartTime}" style="display: flex; width: 100%; font-size: 14px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-weight: bold; font-size: 14px;">เวลาสิ้นสุด:</label>
+                        <input type="time" id="editEndTime" class="swal2-input" value="${currentEndTime}" style="display: flex; width: 100%; font-size: 14px;">
+                    </div>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonColor: '#f39c12',
+        confirmButtonText: 'บันทึกการแก้ไข',
+        cancelButtonText: 'ยกเลิก',
+        preConfirm: () => {
+            const supervisorId = document.getElementById('editSupervisor').value;
+            const date = document.getElementById('editDate').value;
+            const startTime = document.getElementById('editStartTime').value;
+            const endTime = document.getElementById('editEndTime').value;
+            
+            if (!supervisorId || !date || !startTime || !endTime) {
+                Swal.showValidationMessage('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return false;
+            }
+            if (startTime >= endTime) {
+                Swal.showValidationMessage('เวลาเริ่มต้นต้องน้อยกว่าเวลาสิ้นสุด');
+                return false;
+            }
+            return { supervisorId, date, startTime, endTime };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'กำลังบันทึกข้อมูล...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const data = new URLSearchParams();
+            data.append('action', 'edit');
+            data.append('id', id);
+            data.append('supervisor_id', result.value.supervisorId);
+            data.append('date', result.value.date);
+            data.append('start_time', result.value.startTime);
+            data.append('end_time', result.value.endTime);
+
+            fetch('supervision_action.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: data.toString()
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ!',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('เกิดข้อผิดพลาด!', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+            });
+        }
+    });
+}
+
 function deleteSupervision(id) {
     Swal.fire({
         title: 'ยืนยันการลบข้อมูล?',
