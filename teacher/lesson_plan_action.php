@@ -32,6 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
+        // Check for duplicates (1 subject per semester per teacher)
+        $stmt = $pdo->prepare("SELECT id FROM lesson_plans WHERE teacher_id = ? AND academic_year_id = ? AND subject_code = ?");
+        $stmt->execute([$teacher_id, $year_id, $subject_code]);
+        if ($stmt->fetch()) {
+            echo json_encode(['status' => 'error', 'message' => 'คุณได้ส่งแผนการจัดการเรียนรู้วิชานี้ในภาคเรียนนี้ไปแล้ว ไม่สามารถส่งซ้ำได้ (หากต้องการส่งใหม่ กรุณาลบของเดิมก่อน)']);
+            exit;
+        }
+
         // --- RANDOM ASSIGNMENT LOGIC (Load Balancing Document Reviews) ---
         $eligible_evaluators = [];
 
@@ -161,6 +169,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'assigned_reviewer' => $selected_name
             ]);
 
+        } catch (PDOException $e) {
+            echo json_encode(['status' => 'error', 'message' => 'Database Error: ' . $e->getMessage()]);
+        }
+    } elseif ($action === 'delete_plan') {
+        $id = intval($_POST['id'] ?? 0);
+        $teacher_id = $_SESSION['user_id'];
+
+        if (!$id) {
+            echo json_encode(['status' => 'error', 'message' => 'ไม่พบข้อมูลที่ต้องการลบ']);
+            exit;
+        }
+
+        try {
+            // Check ownership and status
+            $stmt = $pdo->prepare("SELECT file_path, status FROM lesson_plans WHERE id = ? AND teacher_id = ?");
+            $stmt->execute([$id, $teacher_id]);
+            $plan = $stmt->fetch();
+
+            if (!$plan) {
+                echo json_encode(['status' => 'error', 'message' => 'ไม่มีสิทธิ์ลบข้อมูลนี้ หรือไม่พบข้อมูล']);
+                exit;
+            }
+
+            if ($plan['status'] === 'approved') {
+                echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถลบแผนการสอนที่ผ่านการประเมินแล้วได้']);
+                exit;
+            }
+
+            // Delete file if exists
+            if (!empty($plan['file_path'])) {
+                $file_absolute_path = __DIR__ . '/../' . $plan['file_path'];
+                if (file_exists($file_absolute_path)) {
+                    unlink($file_absolute_path);
+                }
+            }
+
+            // Delete record
+            $stmt = $pdo->prepare("DELETE FROM lesson_plans WHERE id = ?");
+            $stmt->execute([$id]);
+
+            echo json_encode(['status' => 'success', 'message' => 'ลบข้อมูลสำเร็จ']);
         } catch (PDOException $e) {
             echo json_encode(['status' => 'error', 'message' => 'Database Error: ' . $e->getMessage()]);
         }

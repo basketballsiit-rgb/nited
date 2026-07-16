@@ -125,7 +125,13 @@ $lesson_plans = $stmt->fetchAll();
                         <?php if ($plan['status'] !== 'pending'): ?>
                             <a href="lesson_plan_view_result.php?id=<?php echo $plan['id']; ?>" class="btn-gradient" style="padding: 5px 10px; font-size: 13px; text-decoration: none;">ดูผลตรวจ</a>
                         <?php else: ?>
-                            <span style="color: #aaa; font-size: 13px;"><i class="fas fa-clock"></i> รอกรรมการ</span>
+                            <span style="color: #aaa; font-size: 13px; margin-right: 15px;"><i class="fas fa-clock"></i> รอกรรมการ</span>
+                        <?php endif; ?>
+                        
+                        <?php if ($plan['status'] !== 'approved'): ?>
+                            <button onclick="deletePlan(<?php echo $plan['id']; ?>)" style="background: none; border: none; color: #dc3545; cursor: pointer; font-size: 14px; margin-left: 10px;" title="ลบข้อมูลการส่งนี้">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -178,6 +184,53 @@ document.getElementById('submitPlanForm').addEventListener('submit', function(e)
         Swal.fire('ข้อผิดพลาด', 'ติดต่อเซิร์ฟเวอร์ไม่ได้', 'error');
     });
 });
+
+function deletePlan(id) {
+    Swal.fire({
+        title: 'ยืนยันการลบ?',
+        text: "คุณต้องการลบข้อมูลการส่งแผนการสอนนี้ใช่หรือไม่? (หากลบแล้วสามารถส่งใหม่ได้)",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'ใช่, ลบเลย!',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'กำลังลบข้อมูล...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            const formData = new FormData();
+            formData.append('action', 'delete_plan');
+            formData.append('id', id);
+
+            fetch('lesson_plan_action.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ลบสำเร็จ!',
+                        text: 'ลบข้อมูลการส่งแผนการสอนเรียบร้อยแล้ว'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('ข้อผิดพลาด', data.message, 'error');
+                }
+            })
+            .catch(error => {
+                Swal.fire('ข้อผิดพลาด', 'ติดต่อเซิร์ฟเวอร์ไม่ได้', 'error');
+            });
+        }
+    });
+}
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
