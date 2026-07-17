@@ -40,6 +40,30 @@ if ($year_id > 0) {
     $stmt->execute([$year_id, $year_id]);
     $dept_stats = $stmt->fetchAll();
 }
+
+// Average Score Data per Category (Overall)
+$chart_labels = [];
+$chart_data = [];
+
+if ($year_id > 0) {
+    $stmt = $pdo->prepare("
+        SELECT c.title, AVG((r.score / i.max_score) * 100) as avg_percent
+        FROM supervision_results r
+        JOIN criteria_items i ON r.criteria_item_id = i.id
+        JOIN criteria_categories c ON i.category_id = c.id
+        JOIN supervisions s ON r.supervision_id = s.id
+        WHERE s.academic_year_id = ? AND s.status = 'completed'
+        GROUP BY c.id
+        ORDER BY c.order_idx ASC, c.id ASC
+    ");
+    $stmt->execute([$year_id]);
+    $cat_stats = $stmt->fetchAll();
+
+    foreach ($cat_stats as $c) {
+        $chart_labels[] = mb_substr($c['title'], 0, 40) . (mb_strlen($c['title']) > 40 ? '...' : ''); 
+        $chart_data[] = round($c['avg_percent'], 2);
+    }
+}
 ?>
 
 <div class="content-header" style="margin-bottom: 20px;">
@@ -187,5 +211,70 @@ $reviewer_workload = $pdo->query("
     <h3>ยินดีต้อนรับสู่ระบบบริหารจัดการ</h3>
     <p>คุณสามารถจัดการผู้ใช้งาน หัวข้อการประเมินการนิเทศ และแบบฟอร์มตรวจแผน ได้จากเมนูด้านซ้ายมือ</p>
 </div>
+
+<div class="content-header" style="margin-top: 40px; margin-bottom: 20px;">
+    <h2><i class="fas fa-chart-bar"></i> คะแนนเฉลี่ยผลการประเมิน (รายด้าน) ของวิทยาลัย</h2>
+</div>
+
+<div class="content-card" style="margin-bottom: 30px;">
+    <div style="height: 400px; width: 100%;">
+        <canvas id="overallChart"></canvas>
+    </div>
+    <?php if (empty($chart_data)): ?>
+        <p style="text-align: center; color: #888; margin-top: 20px;">ยังไม่มีข้อมูลการประเมินในเทอมนี้</p>
+    <?php endif; ?>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('overallChart');
+        if(!ctx) return;
+        const context = ctx.getContext('2d');
+
+        let gradient = context.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(233, 64, 87, 0.8)');
+        gradient.addColorStop(1, 'rgba(242, 113, 33, 0.8)');
+
+        const data = {
+            labels: <?php echo json_encode($chart_labels); ?>,
+            datasets: [{
+                label: 'คะแนนเฉลี่ย (%)',
+                data: <?php echo json_encode($chart_data); ?>,
+                backgroundColor: gradient,
+                borderColor: '#E94057',
+                borderWidth: 1,
+                borderRadius: 5
+            }]
+        };
+
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function (value) { return value + '%' }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) { return context.parsed.y + '%'; }
+                        }
+                    }
+                }
+            }
+        };
+
+        new Chart(context, config);
+    });
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
