@@ -53,24 +53,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
         } else {
-            // Regular Teachers evaluated by Supervisors (prioritize specialized/heads) or Executives
-            $stmt = $pdo->query("
-                SELECT id, name FROM users 
-                WHERE role IN ('supervisor', 'executive')
-                AND (
-                    academic_standing LIKE '%ชำนาญการพิเศษ%' 
-                    OR position LIKE '%หัวหน้าสาขาวิชา%'
-                    OR academic_standing = 'ชำนาญการพิเศษ'
-                    OR position = 'หัวหน้าสาขาวิชา'
-                    OR role = 'executive'
-                )
-            ");
-            $eligible_evaluators = $stmt->fetchAll();
-
-            // Fallback
-            if (empty($eligible_evaluators)) {
-                $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('supervisor', 'executive')");
+            // CHECK FOR SHORT COURSE
+            $stmt = $pdo->prepare("SELECT teaching_dept FROM users WHERE id = ?");
+            $stmt->execute([$teacher_id]);
+            $teacher_info = $stmt->fetch();
+            $is_short_course = (strpos($teacher_info['teaching_dept'] ?? '', 'วิชาชีพระยะสั้น') !== false);
+            
+            if ($is_short_course) {
+                // Must be รองผู้อำนวยการฝ่ายวิชาการ ONLY
+                $stmt = $pdo->query("SELECT id, name FROM users WHERE position LIKE '%รองผู้อำนวยการฝ่ายวิชาการ%'");
                 $eligible_evaluators = $stmt->fetchAll();
+                
+                if (empty($eligible_evaluators)) {
+                    // Fallback to executive if none specifically found with that position name
+                    $stmt = $pdo->query("SELECT id, name FROM users WHERE role = 'executive'");
+                    $eligible_evaluators = $stmt->fetchAll();
+                }
+            } else {
+                // Regular Teachers evaluated by Supervisors (prioritize specialized/heads) or Executives
+                $stmt = $pdo->query("
+                    SELECT id, name FROM users 
+                    WHERE role IN ('supervisor', 'executive')
+                    AND (
+                        academic_standing LIKE '%ชำนาญการพิเศษ%' 
+                        OR position LIKE '%หัวหน้าสาขาวิชา%'
+                        OR academic_standing = 'ชำนาญการพิเศษ'
+                        OR position = 'หัวหน้าสาขาวิชา'
+                        OR role = 'executive'
+                    )
+                ");
+                $eligible_evaluators = $stmt->fetchAll();
+
+                // Fallback
+                if (empty($eligible_evaluators)) {
+                    $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('supervisor', 'executive')");
+                    $eligible_evaluators = $stmt->fetchAll();
+                }
             }
 
             if (empty($eligible_evaluators)) {

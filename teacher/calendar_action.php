@@ -124,24 +124,44 @@ try {
                 exit;
             }
         } else {
-            // Find eligible supervisors: role in (supervisor, executive) AND matches high rank
-            $stmt = $pdo->query("
-                SELECT id, name FROM users 
-                WHERE role IN ('supervisor', 'executive') 
-                AND (
-                    academic_standing LIKE '%ชำนาญการพิเศษ%' 
-                    OR position LIKE '%หัวหน้าสาขาวิชา%'
-                    OR academic_standing = 'ชำนาญการพิเศษ'
-                    OR position = 'หัวหน้าสาขาวิชา'
-                    OR role = 'executive'
-                )
-            ");
-            $eligible_evaluators = $stmt->fetchAll();
-
-            // Fallback: If no one matches the strict criteria, just grab ANY supervisor or executive
-            if (empty($eligible_evaluators)) {
-                $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('supervisor', 'executive')");
+            // CHECK FOR SHORT COURSE
+            $stmt = $pdo->prepare("SELECT teaching_dept FROM users WHERE id = ?");
+            $stmt->execute([$teacher_id]);
+            $teacher_info = $stmt->fetch();
+            $is_short_course = (strpos($teacher_info['teaching_dept'] ?? '', 'วิชาชีพระยะสั้น') !== false);
+            
+            if ($is_short_course) {
+                // Must be รองผู้อำนวยการฝ่ายวิชาการ ONLY
+                $stmt = $pdo->query("SELECT id, name FROM users WHERE position LIKE '%รองผู้อำนวยการฝ่ายวิชาการ%'");
                 $eligible_evaluators = $stmt->fetchAll();
+                $evaluator_role_target = 'รองผู้อำนวยการฝ่ายวิชาการ';
+                
+                if (empty($eligible_evaluators)) {
+                    // Fallback to executive if none specifically found with that position name
+                    $stmt = $pdo->query("SELECT id, name FROM users WHERE role = 'executive'");
+                    $eligible_evaluators = $stmt->fetchAll();
+                }
+            } else {
+                // Find eligible supervisors: role in (supervisor, executive) AND matches high rank
+                $stmt = $pdo->query("
+                    SELECT id, name FROM users 
+                    WHERE role IN ('supervisor', 'executive') 
+                    AND (
+                        academic_standing LIKE '%ชำนาญการพิเศษ%' 
+                        OR position LIKE '%หัวหน้าสาขาวิชา%'
+                        OR academic_standing = 'ชำนาญการพิเศษ'
+                        OR position = 'หัวหน้าสาขาวิชา'
+                        OR role = 'executive'
+                    )
+                ");
+                $eligible_evaluators = $stmt->fetchAll();
+
+                // Fallback: If no one matches the strict criteria, just grab ANY supervisor or executive
+                if (empty($eligible_evaluators)) {
+                    $stmt = $pdo->query("SELECT id, name FROM users WHERE role IN ('supervisor', 'executive')");
+                    $eligible_evaluators = $stmt->fetchAll();
+                }
+                $evaluator_role_target = 'กรรมการนิเทศ / ผู้บริหาร';
             }
 
             // Deep Fallback: If there are literally no supervisors at all
@@ -149,7 +169,6 @@ try {
                 echo json_encode(['status' => 'error', 'message' => 'ไม่มีผู้ใช้งานระดับ "กรรมการนิเทศ" หรือ "ผู้บริหาร" ในระบบเลย กรุณาติดต่อผู้ดูแลระบบ']);
                 exit;
             }
-            $evaluator_role_target = 'กรรมการนิเทศ / ผู้บริหาร';
         }
 
         // --- OVERLAP FILTERING LOGIC ---
