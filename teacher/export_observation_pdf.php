@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-if ($_SESSION['role'] !== 'teacher' && $_SESSION['role'] !== 'supervisor' && $_SESSION['role'] !== 'executive') {
+if ($_SESSION['role'] !== 'teacher' && $_SESSION['role'] !== 'supervisor' && $_SESSION['role'] !== 'executive' && $_SESSION['role'] !== 'admin') {
     die("Unauthorized");
 }
 require_once __DIR__ . '/../config/db.php';

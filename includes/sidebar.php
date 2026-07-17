@@ -36,6 +36,9 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
             <li><a href="/nited/admin/manage_supervisions.php"
                     class="<?php echo ($current_dir == 'admin' && $current_page == 'manage_supervisions.php') ? 'active' : ''; ?>"><i
                         class="fas fa-calendar-times"></i> จัดการข้อมูลการจองนิเทศ</a></li>
+            <li><a href="/nited/admin/teacher_reports.php"
+                    class="<?php echo ($current_dir == 'admin' && $current_page == 'teacher_reports.php') ? 'active' : ''; ?>"><i
+                        class="fas fa-file-pdf"></i> รายงานผลการนิเทศรายบุคคล</a></li>
             <li><a href="/nited/admin/manuals.php"
                     class="<?php echo ($current_dir == 'admin' && $current_page == 'manuals.php') ? 'active' : ''; ?>"><i
                         class="fas fa-book"></i> จัดการคู่มือการใช้งาน</a></li>
