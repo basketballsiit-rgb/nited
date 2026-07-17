@@ -125,10 +125,10 @@ try {
             }
         } else {
             // CHECK FOR SHORT COURSE
-            $stmt = $pdo->prepare("SELECT teaching_dept, position FROM users WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT department, position FROM users WHERE id = ?");
             $stmt->execute([$teacher_id]);
             $teacher_info = $stmt->fetch();
-            $is_short_course = (strpos($teacher_info['teaching_dept'] ?? '', 'รายวิชาระยะสั้น') !== false || strpos($teacher_info['position'] ?? '', 'รายวิชาระยะสั้น') !== false);
+            $is_short_course = (strpos($teacher_info['department'] ?? '', 'รายวิชาระยะสั้น') !== false || strpos($teacher_info['position'] ?? '', 'รายวิชาระยะสั้น') !== false);
             
             if ($is_short_course) {
                 // Must be รองผู้อำนวยการฝ่ายวิชาการ ONLY
