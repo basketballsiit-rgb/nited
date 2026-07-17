@@ -71,12 +71,12 @@ $html = '
         text-align: center;
         font-size: 16pt;
         font-weight: bold;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
     .sub-header {
         text-align: center;
-        font-size: 14pt;
-        margin-bottom: 30px;
+        font-size: 16pt;
+        margin-bottom: 20px;
     }
     table {
         width: 100%;
