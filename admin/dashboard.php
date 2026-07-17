@@ -54,7 +54,7 @@ if ($year_id > 0) {
         JOIN supervisions s ON r.supervision_id = s.id
         WHERE s.academic_year_id = ? AND s.status = 'completed'
         GROUP BY c.id
-        ORDER BY c.order_idx ASC, c.id ASC
+        ORDER BY c.id ASC
     ");
     $stmt->execute([$year_id]);
     $cat_stats = $stmt->fetchAll();
