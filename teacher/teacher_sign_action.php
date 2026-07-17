@@ -1,10 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-if ($_SESSION['role'] !== 'teacher') {
-    echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
-    exit;
-}
+// Role check removed. Ownership is validated below based on user_id.
 require_once __DIR__ . '/../config/db.php';
 
 header('Content-Type: application/json');
