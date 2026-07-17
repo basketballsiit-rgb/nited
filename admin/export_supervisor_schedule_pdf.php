@@ -69,13 +69,13 @@ $html = '
     }
     .header {
         text-align: center;
-        font-size: 16pt;
+        font-size: 14pt;
         font-weight: bold;
         margin-bottom: 10px;
     }
     .sub-header {
         text-align: center;
-        font-size: 16pt;
+        font-size: 14pt;
         margin-bottom: 20px;
     }
     table {
