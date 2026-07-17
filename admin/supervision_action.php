@@ -46,6 +46,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $new_scheduled_date = $new_date . ' ' . $new_start_time . ':00';
             $new_end_time_full = $new_date . ' ' . $new_end_time . ':00';
 
+            // Check if the new supervisor is busy at that time (overlap logic)
+            $stmt = $pdo->prepare("
+                SELECT id 
+                FROM supervisions 
+                WHERE supervisor_id = ? 
+                AND id != ?
+                AND status != 'rejected'
+                AND scheduled_date < ? 
+                AND end_time > ?
+            ");
+            $stmt->execute([$new_supervisor_id, $id, $new_end_time_full, $new_scheduled_date]);
+            if ($stmt->fetch()) {
+                echo json_encode(['status' => 'error', 'message' => 'กรรมการท่านนี้มีตารางนิเทศในช่วงเวลาดังกล่าวแล้ว กรุณาเลือกเวลาอื่นหรือเปลี่ยนกรรมการท่านอื่น']);
+                exit;
+            }
+
             // Fetch old supervision data to compare
             $stmt = $pdo->prepare("SELECT teacher_id, supervisor_id, subject_name FROM supervisions WHERE id = ?");
             $stmt->execute([$id]);
