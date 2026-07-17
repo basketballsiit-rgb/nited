@@ -30,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $pdo->prepare("
             INSERT INTO supervisions 
-            (teacher_id, supervisor_id, academic_year_id, subject_code, subject_name, level, scheduled_date, end_time, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'approved')
+            (teacher_id, supervisor_id, academic_year_id, subject_code, subject_name, level, scheduled_date, end_time, status, is_urgent)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'approved', 1)
         ");
         $stmt->execute([
             $teacher_id, 

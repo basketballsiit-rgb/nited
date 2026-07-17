@@ -104,46 +104,69 @@ require_once __DIR__ . '/../includes/header.php';
             <?php endif; ?>
         </div>
 
+        <?php
+            $normal_list = [];
+            $urgent_list = [];
+            foreach ($sups_list as $row) {
+                if (isset($row['is_urgent']) && $row['is_urgent'] == 1) {
+                    $urgent_list[] = $row;
+                } else {
+                    $normal_list[] = $row;
+                }
+            }
+
+            if (!function_exists('renderScheduleAdminHtml')) {
+                function renderScheduleAdminHtml($title, $list) {
+                    if (count($list) == 0) return '';
+                    $html = '<h5 style="margin-top: 15px; margin-bottom: 10px; color: #34495e;">' . $title . '</h5>';
+                    $html .= '<div class="table-responsive"><table><thead><tr>';
+                    $html .= '<th style="width: 5%; text-align: center;">ลำดับ</th>';
+                    $html .= '<th style="width: 15%;">วัน/เดือน/ปี</th>';
+                    $html .= '<th style="width: 15%;">เวลา</th>';
+                    $html .= '<th style="width: 25%;">ครูผู้สอน/ผู้รับการนิเทศ</th>';
+                    $html .= '<th style="width: 25%;">รหัส-ชื่อรายวิชา</th>';
+                    $html .= '<th style="width: 15%;">ระดับชั้น</th>';
+                    $html .= '</tr></thead><tbody>';
+
+                    $thai_months = [
+                        1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม', 4 => 'เมษายน',
+                        5 => 'พฤษภาคม', 6 => 'มิถุนายน', 7 => 'กรกฎาคม', 8 => 'สิงหาคม',
+                        9 => 'กันยายน', 10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
+                    ];
+
+                    foreach ($list as $index => $row) {
+                        $dateObj = new DateTime($row['scheduled_date']);
+                        $d = $dateObj->format('j');
+                        $m = $thai_months[(int)$dateObj->format('n')];
+                        $y = (int)$dateObj->format('Y') + 543;
+                        $formatted_date = "$d $m $y";
+                        
+                        $html .= '<tr>';
+                        $html .= '<td style="text-align: center;">' . ($index + 1) . '</td>';
+                        $html .= '<td>' . $formatted_date . '</td>';
+                        $html .= '<td>' . date('H:i', strtotime($row['scheduled_date'])) . ' - ' . date('H:i', strtotime($row['end_time'])) . ' น.</td>';
+                        $html .= '<td>' . htmlspecialchars($row['teacher_name']) . '</td>';
+                        $html .= '<td>' . htmlspecialchars($row['subject_code'] . ' ' . $row['subject_name']) . '</td>';
+                        $html .= '<td>' . htmlspecialchars($row['level']) . '</td>';
+                        $html .= '</tr>';
+                    }
+                    $html .= '</tbody></table></div>';
+                    return $html;
+                }
+            }
+        ?>
+
         <?php if (count($sups_list) > 0): ?>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 5%; text-align: center;">ลำดับ</th>
-                            <th style="width: 15%;">วัน/เดือน/ปี</th>
-                            <th style="width: 15%;">เวลา</th>
-                            <th style="width: 25%;">ครูผู้สอน/ผู้รับการนิเทศ</th>
-                            <th style="width: 25%;">รหัส-ชื่อรายวิชา</th>
-                            <th style="width: 15%;">ระดับชั้น</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($sups_list as $index => $row): ?>
-                            <?php 
-                                // Format Date
-                                $dateObj = new DateTime($row['scheduled_date']);
-                                $thai_months = [
-                                    1 => 'มกราคม', 2 => 'กุมภาพันธ์', 3 => 'มีนาคม', 4 => 'เมษายน',
-                                    5 => 'พฤษภาคม', 6 => 'มิถุนายน', 7 => 'กรกฎาคม', 8 => 'สิงหาคม',
-                                    9 => 'กันยายน', 10 => 'ตุลาคม', 11 => 'พฤศจิกายน', 12 => 'ธันวาคม'
-                                ];
-                                $d = $dateObj->format('j');
-                                $m = $thai_months[(int)$dateObj->format('n')];
-                                $y = (int)$dateObj->format('Y') + 543;
-                                $formatted_date = "$d $m $y";
-                            ?>
-                            <tr>
-                                <td style="text-align: center;"><?php echo $index + 1; ?></td>
-                                <td><?php echo $formatted_date; ?></td>
-                                <td><?php echo date('H:i', strtotime($row['scheduled_date'])) . ' - ' . date('H:i', strtotime($row['end_time'])); ?> น.</td>
-                                <td><?php echo htmlspecialchars($row['teacher_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['subject_code'] . ' ' . $row['subject_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['level']); ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+            <?php 
+                if (count($normal_list) > 0) {
+                    echo renderScheduleAdminHtml('1. การนิเทศตามตารางนัดหมาย', $normal_list);
+                } else {
+                    echo '<p style="color: #7f8c8d; font-style: italic;">ไม่มีการนิเทศตามตารางนัดหมาย</p>';
+                }
+                if (count($urgent_list) > 0) {
+                    echo renderScheduleAdminHtml('2. การนิเทศแบบเร่งด่วน', $urgent_list);
+                }
+            ?>
         <?php else: ?>
             <p style="text-align: center; color: #95a5a6; padding: 20px 0;">ไม่มีตารางการนิเทศในภาคเรียนนี้</p>
         <?php endif; ?>

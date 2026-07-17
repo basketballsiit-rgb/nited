@@ -49,7 +49,17 @@ $stmt = $pdo->prepare("
     ORDER BY s.scheduled_date ASC
 ");
 $stmt->execute([$year_id, $supervisor_id]);
-$schedules = $stmt->fetchAll();
+$all_schedules = $stmt->fetchAll();
+
+$normal_schedules = [];
+$urgent_schedules = [];
+foreach ($all_schedules as $row) {
+    if (isset($row['is_urgent']) && $row['is_urgent'] == 1) {
+        $urgent_schedules[] = $row;
+    } else {
+        $normal_schedules[] = $row;
+    }
+}
 
 $term = htmlspecialchars($acad_year['term']);
 $year = htmlspecialchars($acad_year['year']);
@@ -125,48 +135,56 @@ if ($sup_position !== '-') {
 }
 $html .= '</div>';
 
-$html .= '<table>';
-$html .= '<thead><tr>';
-$html .= '<th style="width: 10%;">ลำดับ</th>';
-$html .= '<th style="width: 18%;">วัน/เดือน/ปี</th>';
-$html .= '<th style="width: 15%;">เวลา</th>';
-$html .= '<th style="width: 22%;">ครูผู้รับการนิเทศ</th>';
-$html .= '<th style="width: 23%;">รหัส-ชื่อรายวิชา</th>';
-$html .= '<th style="width: 12%;">ระดับชั้น</th>';
-$html .= '</tr></thead>';
-$html .= '<tbody>';
-
-if (count($schedules) > 0) {
+function renderScheduleTable($title, $schedules) {
     $thai_months = [
         1 => 'ม.ค.', 2 => 'ก.พ.', 3 => 'มี.ค.', 4 => 'เม.ย.',
         5 => 'พ.ค.', 6 => 'มิ.ย.', 7 => 'ก.ค.', 8 => 'ส.ค.',
         9 => 'ก.ย.', 10 => 'ต.ค.', 11 => 'พ.ย.', 12 => 'ธ.ค.'
     ];
+    $html = '<div style="font-weight: bold; margin-bottom: 5px; font-size: 11pt;">' . $title . '</div>';
+    $html .= '<table>';
+    $html .= '<thead><tr>';
+    $html .= '<th style="width: 10%;">ลำดับ</th>';
+    $html .= '<th style="width: 18%;">วัน/เดือน/ปี</th>';
+    $html .= '<th style="width: 15%;">เวลา</th>';
+    $html .= '<th style="width: 22%;">ครูผู้รับการนิเทศ</th>';
+    $html .= '<th style="width: 23%;">รหัส-ชื่อรายวิชา</th>';
+    $html .= '<th style="width: 12%;">ระดับชั้น</th>';
+    $html .= '</tr></thead>';
+    $html .= '<tbody>';
 
-    foreach ($schedules as $index => $row) {
-        $dateObj = new DateTime($row['scheduled_date']);
-        $d = $dateObj->format('j');
-        $m = $thai_months[(int)$dateObj->format('n')];
-        $y = (int)$dateObj->format('Y') + 543;
-        $formatted_date = "$d $m $y";
-        
-        $start_time = date('H:i', strtotime($row['scheduled_date']));
-        $end_time = date('H:i', strtotime($row['end_time']));
-        
-        $html .= '<tr>';
-        $html .= '<td class="text-center">' . ($index + 1) . '</td>';
-        $html .= '<td class="text-center">' . $formatted_date . '</td>';
-        $html .= '<td class="text-center">' . $start_time . ' - ' . $end_time . ' น.</td>';
-        $html .= '<td>' . htmlspecialchars($row['teacher_name']) . '</td>';
-        $html .= '<td>' . htmlspecialchars($row['subject_code'] . ' ' . $row['subject_name']) . '</td>';
-        $html .= '<td class="text-center">' . htmlspecialchars($row['level']) . '</td>';
-        $html .= '</tr>';
+    if (count($schedules) > 0) {
+        foreach ($schedules as $index => $row) {
+            $dateObj = new DateTime($row['scheduled_date']);
+            $d = $dateObj->format('j');
+            $m = $thai_months[(int)$dateObj->format('n')];
+            $y = (int)$dateObj->format('Y') + 543;
+            $formatted_date = "$d $m $y";
+            
+            $start_time = date('H:i', strtotime($row['scheduled_date']));
+            $end_time = date('H:i', strtotime($row['end_time']));
+            
+            $html .= '<tr>';
+            $html .= '<td class="text-center">' . ($index + 1) . '</td>';
+            $html .= '<td class="text-center">' . $formatted_date . '</td>';
+            $html .= '<td class="text-center">' . $start_time . ' - ' . $end_time . ' น.</td>';
+            $html .= '<td>' . htmlspecialchars($row['teacher_name']) . '</td>';
+            $html .= '<td>' . htmlspecialchars($row['subject_code'] . ' ' . $row['subject_name']) . '</td>';
+            $html .= '<td class="text-center">' . htmlspecialchars($row['level']) . '</td>';
+            $html .= '</tr>';
+        }
+    } else {
+        $html .= '<tr><td colspan="6" class="text-center">ไม่มีรายการ</td></tr>';
     }
-} else {
-    $html .= '<tr><td colspan="6" class="text-center">ไม่มีตารางการนิเทศ</td></tr>';
+    
+    $html .= '</tbody></table>';
+    return $html;
 }
 
-$html .= '</tbody></table>';
+$html .= renderScheduleTable('1. การนิเทศตามตารางนัดหมาย', $normal_schedules);
+if (count($urgent_schedules) > 0) {
+    $html .= renderScheduleTable('2. การนิเทศแบบเร่งด่วน', $urgent_schedules);
+}
 
 // Signatures
 $html .= '<table class="signature-area" style="border: none;"><tr>';

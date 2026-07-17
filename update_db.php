@@ -1,21 +1,16 @@
 <?php
-require 'config/db.php';
+require_once __DIR__ . '/config/db.php';
 try {
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS notifications (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            message TEXT NOT NULL,
-            link VARCHAR(255) DEFAULT NULL,
-            is_read TINYINT(1) DEFAULT 0,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    ");
-    echo "<h3>ตารางการแจ้งเตือน (notifications) ถูกสร้างเรียบร้อยแล้ว!</h3>";
-    @unlink(__FILE__);
+    // Check if column exists first
+    $stmt = $pdo->query("SHOW COLUMNS FROM supervisions LIKE 'is_urgent'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("ALTER TABLE supervisions ADD COLUMN is_urgent TINYINT(1) DEFAULT 0");
+        echo "Added column is_urgent. ";
+    }
+    
+    // Update existing
+    $count = $pdo->exec("UPDATE supervisions SET is_urgent = 1 WHERE ABS(TIMESTAMPDIFF(SECOND, created_at, scheduled_date)) < 60");
+    echo "Updated $count rows.";
 } catch (Exception $e) {
     echo "Error: " . $e->getMessage();
 }
-?>

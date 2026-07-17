@@ -58,6 +58,7 @@ try {
             photo_path_2 VARCHAR(255) NULL,
             lesson_plan_file VARCHAR(255) NULL,
             signature_path TEXT NULL,
+            is_urgent TINYINT(1) DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
             FOREIGN KEY (supervisor_id) REFERENCES users(id) ON DELETE SET NULL,
