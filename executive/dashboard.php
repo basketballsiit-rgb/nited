@@ -54,7 +54,7 @@ if ($year_id > 0) {
         FROM users u
         LEFT JOIN supervisions s ON u.id = s.teacher_id AND s.academic_year_id = ?
         LEFT JOIN lesson_plans lp ON u.id = lp.teacher_id AND lp.academic_year_id = ?
-        WHERE u.role = 'teacher' 
+        WHERE u.role IN ('teacher', 'supervisor')
           AND u.department IS NOT NULL 
           AND u.department != ''
         GROUP BY u.department
