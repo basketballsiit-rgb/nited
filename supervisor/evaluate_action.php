@@ -16,10 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $scores = $_POST['scores'] ?? []; // Array of criteria_item_id => score
     $comments = $_POST['comments'] ?? []; // Array of criteria_item_id => comment
 
-    // Validate that the request belongs to this supervisor and is approved
-    $stmt = $pdo->prepare("SELECT id FROM supervisions WHERE id = ? AND supervisor_id = ? AND status = 'approved'");
+    // Validate that the request belongs to this supervisor and is approved/completed
+    $stmt = $pdo->prepare("SELECT id, status, photo_path, photo_path_2, signature_path FROM supervisions WHERE id = ? AND supervisor_id = ? AND status IN ('approved', 'completed')");
     $stmt->execute([$supervision_id, $supervisor_id]);
-    if ($stmt->rowCount() === 0) {
+    $existing_sup = $stmt->fetch();
+    if (!$existing_sup) {
         echo json_encode(['status' => 'error', 'message' => 'ข้อมูลการนิเทศไม่ถูกต้อง หรือไม่พร้อมประเมิน']);
         exit;
     }
@@ -33,6 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
+        // Delete old results if this is an update
+        $stmt = $pdo->prepare("DELETE FROM supervision_results WHERE supervision_id = ?");
+        $stmt->execute([$supervision_id]);
+
         // Loop through scores and insert results
         foreach ($scores as $item_id => $score) {
             $comment = isset($comments[$item_id]) ? trim($comments[$item_id]) : '';
@@ -42,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Handle File Uploads
-        $photo_path_1 = null;
-        $photo_path_2 = null;
+        $photo_path_1 = $existing_sup['photo_path'];
+        $photo_path_2 = $existing_sup['photo_path_2'];
         $upload_dir = __DIR__ . '/../assets/uploads/evaluations/';
 
         // Ensure directory exists
@@ -82,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Handle Signature
-        $signature_path = null;
+        $signature_path = $existing_sup['signature_path'];
         $sig_upload_dir = __DIR__ . '/../uploads/signatures/';
 
         if (!empty($_POST['signature_base64'])) {
@@ -110,15 +115,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->commit();
 
         // Fetch teacher to notify
-        $stmt = $pdo->prepare("SELECT teacher_id, subject_name FROM supervisions WHERE id = ?");
-        $stmt->execute([$supervision_id]);
-        $sup = $stmt->fetch();
-        if ($sup) {
-            $supervisor_name = $_SESSION['name'];
-            $title = "ผลการนิเทศการสอน";
-            $message = "กรรมการ {$supervisor_name} ได้ประเมินการนิเทศวิชา {$sup['subject_name']} ของคุณเรียบร้อยแล้ว";
-            $link = "/nited/teacher/history.php";
-            addNotification($pdo, $sup['teacher_id'], $title, $message, $link);
+        if ($existing_sup['status'] !== 'completed') {
+            $stmt = $pdo->prepare("SELECT teacher_id, subject_name FROM supervisions WHERE id = ?");
+            $stmt->execute([$supervision_id]);
+            $sup = $stmt->fetch();
+            if ($sup) {
+                $supervisor_name = $_SESSION['name'];
+                $title = "ผลการนิเทศการสอน";
+                $message = "กรรมการ {$supervisor_name} ได้ประเมินการนิเทศวิชา {$sup['subject_name']} ของคุณเรียบร้อยแล้ว";
+                $link = "/nited/teacher/history.php";
+                addNotification($pdo, $sup['teacher_id'], $title, $message, $link);
+            }
         }
 
         echo json_encode(['status' => 'success']);

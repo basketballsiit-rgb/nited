@@ -22,7 +22,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$supervision_id, $supervisor_id]);
 $supervision = $stmt->fetch();
 
-if (!$supervision || $supervision['status'] !== 'approved') {
+if (!$supervision || ($supervision['status'] !== 'approved' && $supervision['status'] !== 'completed')) {
     $msg = (!$supervision) ? "ไม่พบข้อมูลการนิเทศนี้" : "สถานะการนิเทศนี้ยังไม่พร้อมให้ประเมิน (กรุณายืนยันก่อน)";
     echo "<div class='content-card'><h3>กำลังโหลด... หากมีข้อผิดพลาดกรุณากลับไปหน้าจดบันทึกปฏิทิน</h3><a href='calendar.php' class='btn-gradient'>กลับ</a></div><script>Swal.fire('ข้อผิดพลาด', '{$msg}', 'error').then(()=>window.location='calendar.php');</script>";
     require_once __DIR__ . '/../includes/footer.php';
@@ -37,6 +37,16 @@ $items_by_cat = [];
 $stmt = $pdo->query("SELECT * FROM criteria_items ORDER BY id ASC");
 while ($row = $stmt->fetch()) {
     $items_by_cat[$row['category_id']][] = $row;
+}
+
+// If already completed, fetch existing results
+$existing_results = [];
+if ($supervision['status'] === 'completed') {
+    $stmt = $pdo->prepare("SELECT criteria_item_id, score, comment FROM supervision_results WHERE supervision_id = ?");
+    $stmt->execute([$supervision_id]);
+    while ($r = $stmt->fetch()) {
+        $existing_results[$r['criteria_item_id']] = $r;
+    }
 }
 ?>
 
@@ -112,6 +122,7 @@ while ($row = $stmt->fetch()) {
                                                     </span>
                                                     <input type="radio" name="scores[<?php echo $item['id']; ?>]"
                                                         value="<?php echo $i; ?>" required
+                                                        <?php echo (isset($existing_results[$item['id']]) && $existing_results[$item['id']]['score'] == $i) ? 'checked' : ''; ?>
                                                         style="margin-top: 5px; transform: scale(1.2);">
                                                 </label>
                                             <?php endfor; ?>
@@ -119,6 +130,7 @@ while ($row = $stmt->fetch()) {
                                     </td>
                                     <td style="padding: 15px 10px; vertical-align: top;">
                                         <input type="text" name="comments[<?php echo $item['id']; ?>]"
+                                            value="<?php echo isset($existing_results[$item['id']]) ? htmlspecialchars($existing_results[$item['id']]['comment']) : ''; ?>"
                                             style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"
                                             placeholder="ข้อเสนอแนะ...">
                                     </td>
@@ -147,7 +159,13 @@ while ($row = $stmt->fetch()) {
                             ภาพที่ 1
                         </label>
                         <input type="file" name="evaluation_photo_1" id="evaluation_photo_1" accept="image/*"
-                            capture="environment" style="display: block; margin: 0 auto; max-width: 100%;">
+                            style="display: block; margin: 0 auto; max-width: 100%;">
+                        <?php if(!empty($supervision['photo_path'])): ?>
+                            <div style="margin-top: 10px;">
+                                <img src="/nited/<?php echo $supervision['photo_path']; ?>" style="max-height: 100px; border-radius: 5px;">
+                                <p style="font-size:12px; color:green;"><i class="fas fa-check-circle"></i> มีรูปภาพแล้ว (อัปโหลดใหม่เพื่อเปลี่ยน)</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <div
                         style="flex: 1; min-width: 250px; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px dashed #ccc; text-align: center;">
@@ -158,7 +176,13 @@ while ($row = $stmt->fetch()) {
                             ภาพที่ 2
                         </label>
                         <input type="file" name="evaluation_photo_2" id="evaluation_photo_2" accept="image/*"
-                            capture="environment" style="display: block; margin: 0 auto; max-width: 100%;">
+                            style="display: block; margin: 0 auto; max-width: 100%;">
+                        <?php if(!empty($supervision['photo_path_2'])): ?>
+                            <div style="margin-top: 10px;">
+                                <img src="/nited/<?php echo $supervision['photo_path_2']; ?>" style="max-height: 100px; border-radius: 5px;">
+                                <p style="font-size:12px; color:green;"><i class="fas fa-check-circle"></i> มีรูปภาพแล้ว (อัปโหลดใหม่เพื่อเปลี่ยน)</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <p style="font-size: 13px; color: #666; margin-top: 10px; text-align: center;">รองรับเฉพาะไฟล์รูปภาพ (JPG,
@@ -181,12 +205,18 @@ while ($row = $stmt->fetch()) {
                 <div style="text-align: center; margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
                     <label style="display: block; font-weight: bold; margin-bottom: 5px;">หรืออัปโหลดไฟล์รูปลายเซ็น:</label>
                     <input type="file" name="signature_file" accept="image/*" class="form-control" style="max-width: 400px; margin: 0 auto;">
+                    <?php if(!empty($supervision['signature_path'])): ?>
+                        <div style="margin-top: 10px;">
+                            <img src="<?php echo $supervision['signature_path']; ?>" style="max-height: 50px; border: 1px solid #ddd; background: #fff;">
+                            <p style="font-size:12px; color:green;"><i class="fas fa-check-circle"></i> มีลายเซ็นแล้ว (วาด/อัปโหลดใหม่เพื่อเปลี่ยน)</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
             <div style="text-align: center; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
                 <button type="submit" class="btn-gradient" style="padding: 12px 30px; font-size: 16px;"><i
-                        class="fas fa-save"></i> บันทึกผลการประเมิน</button>
+                        class="fas fa-save"></i> <?php echo ($supervision['status'] === 'completed') ? 'บันทึกการแก้ไข' : 'บันทึกผลการประเมิน'; ?></button>
             </div>
         <?php endif; ?>
     </form>

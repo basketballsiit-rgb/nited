@@ -107,7 +107,8 @@ $supervisor_id = $_SESSION['user_id'];
                 } else if (props.status === 'completed') {
                     statusEl.style.color = '#198754';
                     btns = `
-                    <div style="width:100%; text-align:center; color: #198754; font-weight: bold;"><i class="fas fa-check-circle"></i> การประเมินเสร็จสิ้นแล้ว</div>
+                    <div style="width:100%; text-align:center; color: #198754; font-weight: bold; margin-bottom: 10px;"><i class="fas fa-check-circle"></i> การประเมินเสร็จสิ้นแล้ว</div>
+                    <a href="evaluate.php?id=${currentEventId}" style="width:100%; display:inline-block; background: #6c757d; color: white; text-decoration: none; padding: 10px; border-radius: 5px; cursor: pointer; text-align: center;"><i class="fas fa-edit"></i> แก้ไขผลการประเมิน</a>
                 `;
                 } else if (props.status === 'rejected') {
                     statusEl.style.color = '#dc3545';
