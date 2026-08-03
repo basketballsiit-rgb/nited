@@ -302,20 +302,23 @@ if ($supervision['status'] === 'completed') {
         
         const sigBase64 = document.getElementById('signatureBase64') ? document.getElementById('signatureBase64').value : '';
         const sigFile = document.querySelector('input[name="signature_file"]') ? document.querySelector('input[name="signature_file"]').value : '';
+        const hasExistingSignature = <?php echo (!empty($supervision['signature_path'])) ? 'true' : 'false'; ?>;
 
-        if (!sigBase64 && !sigFile) {
+        if (!sigBase64 && !sigFile && !hasExistingSignature) {
             Swal.fire('กรุณาลงลายมือชื่อ', 'โปรดวาดลายเซ็นบนกระดาน หรืออัปโหลดรูปลายเซ็น ก่อนบันทึกผลการนิเทศ', 'warning');
             return;
         }
 
+        const isEditing = <?php echo ($supervision['status'] === 'completed') ? 'true' : 'false'; ?>;
+        
         Swal.fire({
-            title: 'ยืนยันการบันทึกผล?',
-            text: "เมื่อบันทึกแล้ว ระบบจะถือว่ากระบวนการนิเทศเสร็จสิ้น ไม่สามารถกลับมาแก้ไขได้",
+            title: isEditing ? 'ยืนยันการบันทึกการแก้ไข?' : 'ยืนยันการบันทึกผล?',
+            text: isEditing ? 'คุณสามารถกลับมาแก้ไขได้อีกในภายหลัง' : 'เมื่อบันทึกแล้ว ระบบจะถือว่ากระบวนการนิเทศเสร็จสิ้น',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#28a745',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'บันทึกเลย',
+            confirmButtonText: isEditing ? 'บันทึกการแก้ไข' : 'บันทึกเลย',
             cancelButtonText: 'ยกเลิก'
         }).then((result) => {
             if (result.isConfirmed) {
