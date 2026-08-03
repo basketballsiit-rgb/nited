@@ -90,6 +90,24 @@ if ($supervision['status'] === 'completed') {
     <form id="evalForm" enctype="multipart/form-data">
         <input type="hidden" name="supervision_id" value="<?php echo $supervision['id']; ?>">
 
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd;">
+            <h4 style="margin-top:0; color:#333; margin-bottom: 15px;"><i class="fas fa-clock"></i> ปรับปรุงวัน-เวลาที่นิเทศ (ถ้าต้องการแก้ไข)</h4>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">วันที่นิเทศ <span style="color:red">*</span></label>
+                    <input type="date" name="scheduled_date_only" class="form-control" required value="<?php echo date('Y-m-d', strtotime($supervision['scheduled_date'])); ?>" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">เวลาเริ่ม <span style="color:red">*</span></label>
+                    <input type="time" name="scheduled_time_only" class="form-control" required value="<?php echo date('H:i', strtotime($supervision['scheduled_date'])); ?>" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+                <div style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px;">เวลาสิ้นสุด <span style="color:red">*</span></label>
+                    <input type="time" name="end_time_only" class="form-control" required value="<?php echo date('H:i', strtotime($supervision['end_time'])); ?>" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+            </div>
+        </div>
+
         <?php foreach ($categories as $cat): ?>
             <?php if (isset($items_by_cat[$cat['id']])): ?>
                 <div style="margin-bottom: 30px;">

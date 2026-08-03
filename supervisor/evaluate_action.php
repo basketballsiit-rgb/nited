@@ -123,8 +123,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $stmt = $pdo->prepare("UPDATE supervisions SET status = 'completed', photo_path = ?, photo_path_2 = ?, signature_path = ? WHERE id = ?");
-        $stmt->execute([$photo_path_1, $photo_path_2, $signature_path, $supervision_id]);
+        $update_time_sql = "";
+        $update_params = [$photo_path_1, $photo_path_2, $signature_path];
+
+        if (!empty($_POST['scheduled_date_only']) && !empty($_POST['scheduled_time_only']) && !empty($_POST['end_time_only'])) {
+            $new_start = $_POST['scheduled_date_only'] . ' ' . $_POST['scheduled_time_only'] . ':00';
+            $new_end = $_POST['scheduled_date_only'] . ' ' . $_POST['end_time_only'] . ':00';
+            $update_time_sql = ", scheduled_date = ?, end_time = ?";
+            $update_params[] = $new_start;
+            $update_params[] = $new_end;
+        }
+
+        $update_params[] = $supervision_id;
+
+        $stmt = $pdo->prepare("UPDATE supervisions SET status = 'completed', photo_path = ?, photo_path_2 = ?, signature_path = ? {$update_time_sql} WHERE id = ?");
+        $stmt->execute($update_params);
 
         $pdo->commit();
 
