@@ -59,30 +59,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $allowed_exts = ['jpg', 'jpeg', 'png'];
 
         // Process Photo 1
-        if (isset($_FILES['evaluation_photo_1']) && $_FILES['evaluation_photo_1']['error'] === UPLOAD_ERR_OK) {
-            $file_ext = strtolower(pathinfo($_FILES['evaluation_photo_1']['name'], PATHINFO_EXTENSION));
-            if (in_array($file_ext, $allowed_exts)) {
-                $new_file_name_1 = 'eval_1_' . $supervision_id . '_' . time() . '.' . $file_ext;
-                $dest_path_1 = $upload_dir . $new_file_name_1;
-                if (move_uploaded_file($_FILES['evaluation_photo_1']['tmp_name'], $dest_path_1)) {
-                    $photo_path_1 = 'assets/uploads/evaluations/' . $new_file_name_1;
+        if (isset($_FILES['evaluation_photo_1'])) {
+            $err1 = $_FILES['evaluation_photo_1']['error'];
+            if ($err1 === UPLOAD_ERR_OK) {
+                $file_ext = strtolower(pathinfo($_FILES['evaluation_photo_1']['name'], PATHINFO_EXTENSION));
+                if (in_array($file_ext, $allowed_exts)) {
+                    $new_file_name_1 = 'eval_1_' . $supervision_id . '_' . time() . '.' . $file_ext;
+                    $dest_path_1 = $upload_dir . $new_file_name_1;
+                    if (move_uploaded_file($_FILES['evaluation_photo_1']['tmp_name'], $dest_path_1)) {
+                        $photo_path_1 = 'assets/uploads/evaluations/' . $new_file_name_1;
+                    } else {
+                        throw new Exception("ไม่สามารถอัปโหลดภาพที่ 1 ได้ กรุณาตรวจสอบสิทธิ์โฟลเดอร์");
+                    }
                 } else {
-                    throw new Exception("ไม่สามารถอัปโหลดภาพที่ 1 ได้ กรุณาตรวจสอบสิทธิ์โฟลเดอร์ (Permission) ของ assets/uploads/evaluations/");
+                    throw new Exception("ไฟล์ภาพที่ 1 ไม่รองรับ (รับเฉพาะ jpg, jpeg, png)");
                 }
+            } elseif ($err1 !== UPLOAD_ERR_NO_FILE) {
+                throw new Exception("เกิดข้อผิดพลาดในการอัปโหลดภาพที่ 1 (รหัส: {$err1}) ไฟล์อาจจะใหญ่เกินไป");
             }
         }
 
         // Process Photo 2
-        if (isset($_FILES['evaluation_photo_2']) && $_FILES['evaluation_photo_2']['error'] === UPLOAD_ERR_OK) {
-            $file_ext = strtolower(pathinfo($_FILES['evaluation_photo_2']['name'], PATHINFO_EXTENSION));
-            if (in_array($file_ext, $allowed_exts)) {
-                $new_file_name_2 = 'eval_2_' . $supervision_id . '_' . time() . '.' . $file_ext;
-                $dest_path_2 = $upload_dir . $new_file_name_2;
-                if (move_uploaded_file($_FILES['evaluation_photo_2']['tmp_name'], $dest_path_2)) {
-                    $photo_path_2 = 'assets/uploads/evaluations/' . $new_file_name_2;
+        if (isset($_FILES['evaluation_photo_2'])) {
+            $err2 = $_FILES['evaluation_photo_2']['error'];
+            if ($err2 === UPLOAD_ERR_OK) {
+                $file_ext = strtolower(pathinfo($_FILES['evaluation_photo_2']['name'], PATHINFO_EXTENSION));
+                if (in_array($file_ext, $allowed_exts)) {
+                    $new_file_name_2 = 'eval_2_' . $supervision_id . '_' . time() . '.' . $file_ext;
+                    $dest_path_2 = $upload_dir . $new_file_name_2;
+                    if (move_uploaded_file($_FILES['evaluation_photo_2']['tmp_name'], $dest_path_2)) {
+                        $photo_path_2 = 'assets/uploads/evaluations/' . $new_file_name_2;
+                    } else {
+                        throw new Exception("ไม่สามารถอัปโหลดภาพที่ 2 ได้ กรุณาตรวจสอบสิทธิ์โฟลเดอร์");
+                    }
                 } else {
-                    throw new Exception("ไม่สามารถอัปโหลดภาพที่ 2 ได้ กรุณาตรวจสอบสิทธิ์โฟลเดอร์ (Permission) ของ assets/uploads/evaluations/");
+                    throw new Exception("ไฟล์ภาพที่ 2 ไม่รองรับ (รับเฉพาะ jpg, jpeg, png)");
                 }
+            } elseif ($err2 !== UPLOAD_ERR_NO_FILE) {
+                throw new Exception("เกิดข้อผิดพลาดในการอัปโหลดภาพที่ 2 (รหัส: {$err2}) ไฟล์อาจจะใหญ่เกินไป");
             }
         }
 
@@ -130,9 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         echo json_encode(['status' => 'success']);
 
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         $pdo->rollBack();
-        echo json_encode(['status' => 'error', 'message' => 'Database Error: ' . $e->getMessage()]);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
