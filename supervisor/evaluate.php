@@ -295,6 +295,43 @@ if ($supervision['status'] === 'completed') {
         }
     }
 
+    async function compressImage(file, max_width = 1200) {
+        return new Promise((resolve) => {
+            if (!file || !file.type.match(/image.*/)) {
+                resolve(file);
+                return;
+            }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > max_width) {
+                        height = Math.round((height * max_width) / width);
+                        width = max_width;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        const newFile = new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() });
+                        resolve(newFile);
+                    }, 'image/jpeg', 0.8);
+                };
+                img.onerror = () => resolve(file);
+            };
+            reader.onerror = () => resolve(file);
+        });
+    }
+
     document.getElementById('evalForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
@@ -322,28 +359,45 @@ if ($supervision['status'] === 'completed') {
             cancelButtonText: 'ยกเลิก'
         }).then((result) => {
             if (result.isConfirmed) {
-                const formData = new FormData(this);
-
                 Swal.fire({
-                    title: 'กำลังบันทึกข้อมูล...',
+                    title: 'กำลังประมวลผลรูปภาพและบันทึกข้อมูล...',
                     allowOutsideClick: false,
                     didOpen: () => { Swal.showLoading(); }
                 });
 
-                fetch('evaluate_action.php', {
-                    method: 'POST', body: formData
-                })
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            Swal.fire({
-                                icon: 'success', title: 'ประเมินผลสำเร็จ!', showConfirmButton: false, timer: 1500
-                            }).then(() => window.location = 'calendar.php');
-                        } else {
-                            Swal.fire('ข้อผิดพลาด', data.message, 'error');
-                        }
+                (async () => {
+                    const form = document.getElementById('evalForm');
+                    const formData = new FormData(form);
+
+                    // Compress evaluation_photo_1
+                    const photo1 = document.getElementById('evaluation_photo_1').files[0];
+                    if (photo1) {
+                        const compressed1 = await compressImage(photo1);
+                        formData.set('evaluation_photo_1', compressed1);
+                    }
+                    
+                    // Compress evaluation_photo_2
+                    const photo2 = document.getElementById('evaluation_photo_2').files[0];
+                    if (photo2) {
+                        const compressed2 = await compressImage(photo2);
+                        formData.set('evaluation_photo_2', compressed2);
+                    }
+
+                    fetch('evaluate_action.php', {
+                        method: 'POST', body: formData
                     })
-                    .catch(() => Swal.fire('ข้อผิดพลาด', 'ติดต่อเซิร์ฟเวอร์ไม่ได้', 'error'));
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success', title: 'ประเมินผลสำเร็จ!', showConfirmButton: false, timer: 1500
+                                }).then(() => window.location = 'calendar.php');
+                            } else {
+                                Swal.fire('ข้อผิดพลาด', data.message, 'error');
+                            }
+                        })
+                        .catch(() => Swal.fire('ข้อผิดพลาด', 'ติดต่อเซิร์ฟเวอร์ไม่ได้', 'error'));
+                })();
             }
         });
     });
