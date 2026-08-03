@@ -1,5 +1,7 @@
 <?php
 // config/db.php
+date_default_timezone_set('Asia/Bangkok');
+
 $host = 'localhost';
 $dbname = 'supervision_db';
 $username = 'root'; // default XAMPP user
