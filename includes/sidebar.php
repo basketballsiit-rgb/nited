@@ -121,6 +121,9 @@ $current_dir = basename(dirname($_SERVER['PHP_SELF']));
             <li><a href="/nited/supervisor/calendar.php"
                     class="<?php echo ($current_dir == 'supervisor' && $current_page == 'calendar.php') ? 'active' : ''; ?>"><i
                         class="fas fa-calendar-check"></i> จัดการคำขอนิเทศ</a></li>
+            <li><a href="/nited/supervisor/evaluation_history.php"
+                    class="<?php echo ($current_dir == 'supervisor' && $current_page == 'evaluation_history.php') ? 'active' : ''; ?>"><i
+                        class="fas fa-edit"></i> ประวัติและแก้ไขผลนิเทศ</a></li>
             <li><a href="/nited/supervisor/lesson_plans_review.php"
                     class="<?php echo ($current_dir == 'supervisor' && $current_page == 'lesson_plans_review.php') ? 'active' : ''; ?>"><i
                         class="fas fa-file-signature"></i> ตรวจแผนการจัดการเรียนรู้</a></li>

@@ -2,7 +2,7 @@
 // supervisor/evaluation_history.php
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-if ($_SESSION['role'] !== 'supervisor') {
+if ($_SESSION['role'] !== 'supervisor' && $_SESSION['role'] !== 'executive') {
     header("Location: /nited/index.php");
     exit;
 }
